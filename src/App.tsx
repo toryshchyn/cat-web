@@ -2,8 +2,10 @@ import './App.css'
 import { useAuth0 } from '@auth0/auth0-react'
 import useApiService from './hooks/useApiService';
 import { ToastContainer, toast } from 'react-toastify';
+import { useEffect, useState } from 'react';
 
 const App:React.FC = () => {
+  const [containers, setContainers] = useState<{id: number, name: string}[]>([]);
   const {
     loginWithRedirect,
     logout,
@@ -14,6 +16,15 @@ const App:React.FC = () => {
   } = useAuth0();
 
   const apiService = useApiService();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      console.log('Load containers');
+      apiService.getContainers().then((containers) => {
+        setContainers(containers);
+      });
+    }
+  }, [isAuthenticated, apiService]);
 
   if (isLoading) return <div>Loading...</div>;
 
@@ -45,6 +56,15 @@ const App:React.FC = () => {
           <button onClick={() => handleCallProtectedApi()} style={{ marginLeft: '1rem' }}>
             Call Protected API
           </button>
+          <div>
+            <select>
+              {containers.map((container) => (
+                <option key={container.id} value={container.id}>
+                  {container.name}
+                </option>
+              ))}
+            </select>
+          </div>
         </>
       )}
       <ToastContainer />

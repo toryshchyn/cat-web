@@ -15,4 +15,13 @@ export class ApiService {
         });
         return await res.json();
     };
+
+    static async getContainers(getAccessToken: () => Promise<string> = this.accessTokenProvider) {
+        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/containers`, {
+        headers: {
+            Authorization: `Bearer ${await getAccessToken?.()}`,
+        },
+        });
+        return await res.json();
+    };
 }
