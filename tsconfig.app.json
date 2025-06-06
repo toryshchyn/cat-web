@@ -23,4 +23,8 @@
     "noUncheckedSideEffectImports": true
   },
   "include": ["src"]
+  ,
+  "paths": {
+    "@Spa/*": ["src/*"]
+  }
 }
