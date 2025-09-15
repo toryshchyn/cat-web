@@ -51,7 +51,7 @@ function mapItem(raw: ItemResponse): ItemRow {
     return {
         ...raw,
         imageUrl: raw.image_id
-            ? `${import.meta.env.VITE_API_BASE_URL}/api/image/${raw.image_id}` // ✅ без "s"
+            ? `${import.meta.env.VITE_API_BASE_URL}/api/image/${raw.image_id}`
             : undefined,
     };
 }
