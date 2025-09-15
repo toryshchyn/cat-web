@@ -1,4 +1,4 @@
-export class ApiService {
+export abstract class ApiService {
     static accessTokenProvider: () => Promise<string> = async () => {
         throw new Error('Access token provider not set');
     };
@@ -19,7 +19,7 @@ export class ApiService {
     protected static async request<T>(
         path: string,
         options: RequestInit = {},
-        getAccessToken: () => Promise<string> = this.accessTokenProvider
+        getAccessToken: () => Promise<string> = ApiService.accessTokenProvider
     ): Promise<T> {
         const token = await getAccessToken?.();
         console.log("Access token: ", token);
@@ -28,7 +28,7 @@ export class ApiService {
             ...options,
             headers: {
                 ...(options.headers || {}),
-                Authorization: `Bearer ${await getAccessToken?.()}`
+                Authorization: `Bearer ${token}`
             }
         });
 

@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { Box, Button, Stack, Typography } from '@mui/material';
 import { UploadResponse } from '../services/images';
+import { validateImage } from '../other/fileValidation';
 
 type Props = {
   uploader: (file: File) => Promise<UploadResponse>;
@@ -8,7 +9,7 @@ type Props = {
   onRemoved?: () => void;
   disabled?: boolean;
   maxSizeMb?: number;
-  accept?: string;
+  accept?: string[];
 };
 
 const ImageUpload: React.FC<Props> = ({
@@ -17,7 +18,7 @@ const ImageUpload: React.FC<Props> = ({
   onRemoved,
   disabled = false,
   maxSizeMb = 10,
-  accept = 'image/png, image/jpeg',
+  accept = ['image/png', 'image/jpeg'],
 }) => {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [localUrl, setLocalUrl] = useState<string | null>(null);
@@ -26,20 +27,8 @@ const ImageUpload: React.FC<Props> = ({
 
   const openPicker = () => inputRef.current?.click();
 
-  const validate = (file: File) => {
-    if (!['image/jpeg', 'image/png'].includes(file.type)) {
-      return 'Only JPG and PNG files are allowed.';
-    }
-    if (file.size > maxSizeMb * 1024 * 1024) {
-      return `File too large (max ${maxSizeMb}MB).`;
-    }
-    return null;
-  };
-
-  const onChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const msg = validate(file);
+  const handleFile = async (file: File) => {
+    const msg = validateImage(file, maxSizeMb, accept);
     if (msg) {
       setError(msg);
       return;
@@ -52,8 +41,6 @@ const ImageUpload: React.FC<Props> = ({
     try {
       setUploading(true);
       const res = await uploader(file);
-      console.log("Uploading result:", res);
-      console.log("Passing to parent only id:", res.id);
       onUploaded(res.id);
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Upload failed';
@@ -64,8 +51,17 @@ const ImageUpload: React.FC<Props> = ({
     }
   };
 
+  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      handleFile(file);
+    }
+  };
+
   const remove = () => {
-    if (localUrl) URL.revokeObjectURL(localUrl);
+    if (localUrl) {
+      URL.revokeObjectURL(localUrl);
+    }
     setLocalUrl(null);
     setError(null);
     onRemoved?.();
@@ -73,7 +69,9 @@ const ImageUpload: React.FC<Props> = ({
 
   useEffect(() => {
     return () => {
-      if (localUrl) URL.revokeObjectURL(localUrl);
+      if (localUrl) {
+        URL.revokeObjectURL(localUrl);
+      }
     };
   }, [localUrl]);
 
@@ -90,7 +88,7 @@ const ImageUpload: React.FC<Props> = ({
       <input
         ref={inputRef}
         type="file"
-        accept={accept}
+        accept={accept.join(',')}
         hidden
         onChange={onChange}
         disabled={disabled || uploading}
@@ -100,7 +98,7 @@ const ImageUpload: React.FC<Props> = ({
         {!localUrl ? (
           <>
             <Typography variant="body1" color="text.secondary">
-              Upload image (JPG/PNG, ≤ {maxSizeMb}MB)
+              Upload image ({accept.join(', ')}, ≤ {maxSizeMb}MB)
             </Typography>
             <Button variant="contained" onClick={openPicker} disabled={disabled || uploading}>
               {uploading ? 'Uploading…' : 'Add image'}

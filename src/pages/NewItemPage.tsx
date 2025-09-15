@@ -1,88 +1,25 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Button, Card, CardContent, Container, Stack, TextField, Typography } from '@mui/material';
 import Grid from '@mui/material/Grid';
-import { useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
-import { useAuth0 } from '@auth0/auth0-react';
-import { toast } from 'react-toastify';
 import ImageUpload from '../components/ImageUpload';
-import { ItemApi, CreateItemRequest } from '../services/items';
 import { ContainerAutocomplete } from '../components/ContainerAutocomplete';
 import { TagAutocomplete } from '../components/TagAutocomplete';
-import { ImageApi } from '../services/images';
-
-export type FormValues = {
-  name: string;
-  description?: string | null;
-  container_id: number | null;
-  tags: number[];
-};
+import { useNewItemForm } from '../hooks/useNewItemForm';
 
 const NewItemPage: React.FC = () => {
-  const navigate = useNavigate();
-  const { getAccessTokenSilently } = useAuth0();
-
-  const [saving, setSaving] = useState(false);
-  const [lastContainerId, setLastContainerId] = useState<number | null>(null);
-  const [imageId, setImageId] = useState<number | null>(null);
+  const {
+    form,
+    saving,
+    setImageId,
+    saveItem,
+    uploadImage
+  } = useNewItemForm();
 
   const {
     control,
     register,
-    formState: { errors },
-    reset,
-    getValues
-  } = useForm<FormValues>({
-    defaultValues: { name: '', description: '', container_id: lastContainerId, tags: [] },
-    mode: 'onBlur',
-  });
-
-  const buildPayload = (): CreateItemRequest => {
-    const v = getValues();
-    if (!v.container_id) throw new Error('Container is required');
-    return {
-      name: v.name.trim(),
-      description: v.description?.trim() || null,
-      container_id: v.container_id,
-      image_id: imageId,
-      tags: v.tags,
-    };
-  };
-
-  const onSaveAndClose = async () => {
-    try {
-      setSaving(true);
-      const payload = await buildPayload();
-      await ItemApi.createItem(payload);
-      toast.success('Item added successfully');
-      navigate('/dashboard');
-    } catch (e: unknown) {
-      const message = e instanceof Error ? e.message : 'Failed to save item';
-      toast.error(message);
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const onSaveAndNext = async () => {
-    try {
-      setSaving(true);
-      const payload = await buildPayload();
-      await ItemApi.createItem(payload);
-      const keepContainer = getValues('container_id');
-      setLastContainerId(keepContainer);
-      reset({ name: '', description: '', container_id: keepContainer, tags: [] });
-      setImageId(null);
-      toast.success('Item added successfully');
-    } catch (e: unknown) {
-      const message = e instanceof Error ? e.message : 'Failed to save item';
-      toast.error(message);
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const onCancel = () => navigate(-1);
+    formState: { errors }
+  } = form;
 
   return (
     <Container maxWidth="sm" sx={{ py: 4 }}>
@@ -92,7 +29,7 @@ const NewItemPage: React.FC = () => {
         <CardContent>
           <Grid container spacing={2}>
             <Grid size={{ xs: 12, sm: 6 }}>
-              <ContainerAutocomplete<FormValues>
+              <ContainerAutocomplete
                 control={control}
                 name="container_id"
                 disabled={saving}
@@ -118,30 +55,26 @@ const NewItemPage: React.FC = () => {
                 fullWidth
                 multiline
                 minRows={3}
-                {...register('description')}
+                {...register('description', {
+                  required: 'Description is required',
+                })}
+                error={!!errors.description}
+                helperText={errors.description?.message}
               />
             </Grid>
 
             <Grid size={{ xs: 12, sm: 6 }}>
-              <TagAutocomplete<FormValues>
+              <TagAutocomplete
                 control={control}
                 name="tags"
                 disabled={saving}
               />
             </Grid>
 
-            <Grid size={{ xs: 12 }} display={'flex'} justifyContent={'center'}>
+            <Grid size={{ xs: 12 }} display="flex" justifyContent="center">
               <ImageUpload
-                uploader={(file) =>
-                  ImageApi.uploadImage(file, () =>
-                    getAccessTokenSilently({
-                      authorizationParams: {
-                        audience: import.meta.env.VITE_AUTH0_AUDIENCE,
-                      },
-                    })
-                  )
-                }
-                onUploaded={(id) => setImageId(id)}
+                uploader={uploadImage}
+                onUploaded={setImageId}
                 onRemoved={() => setImageId(null)}
                 disabled={saving}
               />
@@ -151,29 +84,27 @@ const NewItemPage: React.FC = () => {
               <Stack direction="column" spacing={2} sx={{ width: '100%' }}>
                 <Button
                   variant="contained"
-                  onClick={onSaveAndClose}
+                  onClick={() => saveItem(true)}
                   disabled={saving}
                 >
                   Save and close
                 </Button>
                 <Button
                   variant="outlined"
-                  onClick={onSaveAndNext}
+                  onClick={() => saveItem(false)}
                   disabled={saving}
                 >
                   Save and add next
                 </Button>
-                <Button color="error" onClick={onCancel} disabled={saving}>
+                <Button color="error" onClick={() => history.back()} disabled={saving}>
                   Cancel
                 </Button>
               </Stack>
             </Grid>
           </Grid>
-
-          { }
         </CardContent>
       </Card>
-    </Container>
+    </Container >
   );
 };
 
