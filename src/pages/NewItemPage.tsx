@@ -76,7 +76,6 @@ const NewItemPage: React.FC = () => {
     try {
       setSaving(true);
       const payload = await buildPayload();
-      console.log("Payload перед відправкою:", payload); // ✅
       await ApiService.createItem(payload);
       const keepContainer = getValues('container_id');
       setLastContainerId(keepContainer);
