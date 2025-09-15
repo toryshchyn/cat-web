@@ -1,24 +1,17 @@
 import React, { useState } from 'react';
-import {
-  Button,
-  Card,
-  CardContent,
-  Container,
-  Stack,
-  TextField,
-  Typography
-} from '@mui/material';
+import { Button, Card, CardContent, Container, Stack, TextField, Typography } from '@mui/material';
 import Grid from '@mui/material/Grid';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { useAuth0 } from '@auth0/auth0-react';
 import { toast } from 'react-toastify';
 import ImageUpload from '../components/ImageUpload';
-import { ApiService, CreateItemRequest } from '../services/api-service';
+import { ItemApi, CreateItemRequest } from '../services/items';
 import { ContainerAutocomplete } from '../components/ContainerAutocomplete';
 import { TagAutocomplete } from '../components/TagAutocomplete';
+import { ImageApi } from '../services/images';
 
-type FormValues = {
+export type FormValues = {
   name: string;
   description?: string | null;
   container_id: number | null;
@@ -60,8 +53,7 @@ const NewItemPage: React.FC = () => {
     try {
       setSaving(true);
       const payload = await buildPayload();
-      console.log("Payload перед відправкою:", payload);
-      await ApiService.createItem(payload);
+      await ItemApi.createItem(payload);
       toast.success('Item added successfully');
       navigate('/dashboard');
     } catch (e: unknown) {
@@ -76,7 +68,7 @@ const NewItemPage: React.FC = () => {
     try {
       setSaving(true);
       const payload = await buildPayload();
-      await ApiService.createItem(payload);
+      await ItemApi.createItem(payload);
       const keepContainer = getValues('container_id');
       setLastContainerId(keepContainer);
       reset({ name: '', description: '', container_id: keepContainer, tags: [] });
@@ -141,7 +133,7 @@ const NewItemPage: React.FC = () => {
             <Grid size={{ xs: 12 }} display={'flex'} justifyContent={'center'}>
               <ImageUpload
                 uploader={(file) =>
-                  ApiService.uploadImage(file, () =>
+                  ImageApi.uploadImage(file, () =>
                     getAccessTokenSilently({
                       authorizationParams: {
                         audience: import.meta.env.VITE_AUTH0_AUDIENCE,

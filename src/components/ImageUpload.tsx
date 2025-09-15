@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { Box, Button, Stack, Typography } from '@mui/material';
-import { UploadResponse } from '../services/api-service';
+import { UploadResponse } from '../services/images';
 
 type Props = {
   uploader: (file: File) => Promise<UploadResponse>;

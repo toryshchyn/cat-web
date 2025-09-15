@@ -1,18 +1,7 @@
 import React from 'react';
-import {
-  Autocomplete,
-  CircularProgress,
-  TextField,
-  createFilterOptions,
-} from '@mui/material';
-import {
-  Controller,
-  Control,
-  FieldValues,
-  Path,
-} from 'react-hook-form';
-import type { ContainerRow } from '../services/api-service';
-import { ApiService } from '../services/api-service';
+import { Autocomplete, CircularProgress, TextField, createFilterOptions } from '@mui/material';
+import { Controller, Control, FieldValues, Path } from 'react-hook-form';
+import { ContainerRow, ContainerApi } from '../services/containers';
 
 type AddOption = {
   __add: true;
@@ -47,7 +36,7 @@ export function ContainerAutocomplete<FV extends FieldValues>({
   React.useEffect(() => {
     let mounted = true;
     setLoading(true);
-    ApiService.getContainers()
+    ContainerApi.getContainers()
       .then((list) => {
         if (mounted) setOptions(list);
       })
@@ -87,7 +76,7 @@ export function ContainerAutocomplete<FV extends FieldValues>({
               if (!toCreate) return;
 
               try {
-                const created = await ApiService.createContainer({ name: toCreate });
+                const created = await ContainerApi.createContainer({ name: toCreate });
                 if (created) {
                   setOptions((prev) => [created, ...prev]);
                   field.onChange(created.id);

@@ -1,16 +1,7 @@
 import React from 'react';
-import {
-  Autocomplete,
-  CircularProgress,
-  TextField
-} from '@mui/material';
-import {
-  Control,
-  Controller,
-  FieldValues,
-  Path,
-} from 'react-hook-form';
-import { ApiService, TagRow } from '../services/api-service';
+import { Autocomplete, CircularProgress, TextField } from '@mui/material';
+import { Control, Controller, FieldValues, Path } from 'react-hook-form';
+import { TagRow, TagApi } from '../services/tags';
 
 type Props<FormValues extends FieldValues> = {
   control: Control<FormValues>;
@@ -31,7 +22,7 @@ export function TagAutocomplete<FormValues extends FieldValues>({
   React.useEffect(() => {
     let mounted = true;
     setLoading(true);
-    ApiService.getTags()
+    TagApi.getTags()
       .then((list) => { if (mounted) setOptions(list); })
       .finally(() => { if (mounted) setLoading(false); });
     return () => { mounted = false; };
@@ -74,7 +65,7 @@ export function TagAutocomplete<FormValues extends FieldValues>({
                   }
 
                   try {
-                    const created = await ApiService.createTag({ name });
+                    const created = await TagApi.createTag({ name });
                     if (created) {
                       setOptions(prev => [created, ...prev]);
                       ids.push(created.id);
