@@ -30,7 +30,10 @@ export function mapItem(raw: ItemResponse): ItemRow {
 }
 
 export class ItemApi extends ApiService {
-  static createItem(body: CreateItemRequest, getAccessToken = this.accessTokenProvider) {
+  static createItem(
+    body: CreateItemRequest,
+    getAccessToken = this.accessTokenProvider
+  ) {
     return this.request<ItemRow>(
       "/api/item",
       {
@@ -48,6 +51,18 @@ export class ItemApi extends ApiService {
   ): Promise<ItemRow[]> {
     const data = await this.request<ItemResponse[]>(
       `/api/items/by-container/${containerId}`,
+      {},
+      getAccessToken
+    );
+    return data.map(mapItem);
+  }
+
+  static async getItemsByTag(
+    tagId: number,
+    getAccessToken = this.accessTokenProvider
+  ): Promise<ItemRow[]> {
+    const data = await this.request<ItemResponse[]>(
+      `/api/items/by-tag/${tagId}`,
       {},
       getAccessToken
     );
