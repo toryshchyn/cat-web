@@ -1,6 +1,5 @@
 import { Autocomplete, CircularProgress, TextField } from '@mui/material';
 import { Control, Controller, FieldValues, Path } from 'react-hook-form';
-import { mapValuesToIds } from '../other/mapValuesToIds';
 
 type Props<FV extends FieldValues, T extends { id: number; name: string }> = {
   control: Control<FV, unknown>;
@@ -12,6 +11,8 @@ type Props<FV extends FieldValues, T extends { id: number; name: string }> = {
   options: T[];
   loading: boolean;
   addOne?: (name: string) => Promise<T | null>;
+  error?: boolean;
+  helperText?: string;
 };
 
 export function BaseAutocomplete<
@@ -26,7 +27,9 @@ export function BaseAutocomplete<
   freeSolo = false,
   options,
   loading,
-  addOne
+  addOne,
+  error,
+  helperText
 }: Props<FV, T>) {
   return (
     <Controller
@@ -51,21 +54,39 @@ export function BaseAutocomplete<
             loading={loading}
             disabled={disabled}
             getOptionLabel={(opt) => (typeof opt === 'string' ? opt : opt.name)}
-            isOptionEqualToValue={(a, b) => a.id === b.id}
+            isOptionEqualToValue={(a, b) =>
+              typeof a !== 'string' && typeof b !== 'string' && a.id === b.id
+            }
             onChange={async (_e, newValue) => {
+              const normalize = (s: string) => s.trim().toLocaleLowerCase();
+
+              const toId = async (v: string | T | null): Promise<number | null> => {
+                if (!v) {
+                  return null;
+                }
+                if (typeof v === 'string') {
+                  const existing = options.find(o => normalize(o.name) === normalize(v));
+                  if (existing) {
+                    return existing.id;
+                  }
+                  if (addOne) {
+                    const created = await addOne(v.trim());
+                    return created?.id ?? null;
+                  }
+                  return null;
+                }
+                return v.id;
+              };
+
               if (multiple) {
-                const ids = await mapValuesToIds(
-                  newValue as (string | T)[],
-                  options,
-                  addOne!
-                );
+                const ids = (await Promise.all(
+                  (newValue as (string | T)[]).map(toId)
+                )).filter((id): id is number => id !== null);
                 field.onChange(ids);
               } else {
-                const ids = await mapValuesToIds(
-                  [newValue as string | T | null],
-                  options,
-                  addOne
-                );
+                const ids = (await Promise.all(
+                  [newValue as string | T | null].map(toId)
+                )).filter((id): id is number => id !== null);
                 field.onChange(ids.length ? ids[0] : null);
               }
             }}
@@ -73,8 +94,8 @@ export function BaseAutocomplete<
               <TextField
                 {...params}
                 label={label}
-                error={!!fieldState.error}
-                helperText={fieldState.error?.message}
+                error={error || !!fieldState.error}
+                helperText={helperText || fieldState.error?.message}
                 InputProps={{
                   ...params.InputProps,
                   endAdornment: (

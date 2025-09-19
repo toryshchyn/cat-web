@@ -1,29 +1,31 @@
 import React from "react";
 import { Container, Typography } from "@mui/material";
-import { useNewItemForm } from "../hooks/useNewItemForm";
+import { useEditItemForm } from "../hooks/useEditItemForm";
 import ItemForm from "../components/ItemForm";
 
-const NewItemPage: React.FC = () => {
+const EditItemPage: React.FC = () => {
   const {
     form,
     loading,
-    saveItem
-  } = useNewItemForm();
+    updateItem,
+    initialImageUrl
+  } = useEditItemForm();
 
   return (
     <Container maxWidth="sm" sx={{ py: 4 }}>
       <Typography variant="h5" gutterBottom>
-        New item
+        Edit item
       </Typography>
 
       <ItemForm
         form={form}
         loading={loading}
-        onSubmit={saveItem}
-        mode="new"
+        onSubmit={updateItem}
+        mode="edit"
+        initialImageUrl={initialImageUrl}
       />
     </Container>
   );
 };
 
-export default NewItemPage;
+export default EditItemPage;

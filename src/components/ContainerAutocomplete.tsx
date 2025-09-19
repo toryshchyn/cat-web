@@ -1,39 +1,20 @@
-import { Control, FieldValues, Path } from 'react-hook-form';
-import { ContainerRow, ContainerApi } from '../services/containers';
-import { useResourceAutocomplete } from '../hooks/useResourceAutocomplete';
-import { BaseAutocomplete } from './BaseAutocomplete';
-import { useAuth0 } from '@auth0/auth0-react';
+import { FieldValues } from 'react-hook-form';
+import { ContainerRow, ContainerApiService } from '../services/container-api-service';
+import { ResourceAutocomplete } from './ResourceAutocomplete';
 
-type Props<FV extends FieldValues> = {
-  control: Control<FV>;
-  name: Path<FV>;
-  label?: string;
-  disabled?: boolean;
-};
+type ContainerAutocompleteProps<FV extends FieldValues> = Omit<
+  React.ComponentProps<typeof ResourceAutocomplete<FV, ContainerRow>>,
+  'label' | 'fetchAll' | 'createOne'
+>;
 
-export function ContainerAutocomplete<FV extends FieldValues>({
-  control,
-  name,
-  label = 'Container',
-  disabled,
-}: Props<FV>) {
-  const { getAccessTokenSilently } = useAuth0();
-
-  const { options, loading, addOne } = useResourceAutocomplete(
-    () => ContainerApi.getContainers(getAccessTokenSilently),
-    (data) => ContainerApi.createContainer(data, getAccessTokenSilently)
-  );
-
-  return (
-    <BaseAutocomplete<FV, ContainerRow>
-      control={control}
-      name={name}
-      label={label}
-      disabled={disabled}
-      options={options}
-      loading={loading}
-      addOne={addOne}
-      freeSolo
-    />
-  );
-}
+export const ContainerAutocomplete = <FV extends FieldValues>(
+  props: ContainerAutocompleteProps<FV>
+) => (
+  <ResourceAutocomplete<FV, ContainerRow>
+    {...props}
+    label="Container"
+    fetchAll={ContainerApiService.getContainers}
+    createOne={ContainerApiService.createContainer}
+    freeSolo
+  />
+);

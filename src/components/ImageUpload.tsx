@@ -1,7 +1,8 @@
-import React, { useRef, useState, useEffect } from 'react';
-import { Box, Button, Stack, Typography } from '@mui/material';
-import { UploadResponse } from '../services/images';
-import { validateImage } from '../other/fileValidation';
+import React, { useRef, useState, useEffect } from "react";
+import { Box, Button, Stack, Typography } from "@mui/material";
+import { UploadResponse } from "../services/image-api-service";
+import { validateImage } from "../other/fileValidation";
+import { useProtectedImage } from "../hooks/useProtectedImage";
 
 type Props = {
   uploader: (file: File) => Promise<UploadResponse>;
@@ -10,6 +11,9 @@ type Props = {
   disabled?: boolean;
   maxSizeMb?: number;
   accept?: string[];
+  initialImageId?: number | null;
+  initialImageUrl?: string | null;
+  getAccessToken?: () => Promise<string>;
 };
 
 const ImageUpload: React.FC<Props> = ({
@@ -18,97 +22,102 @@ const ImageUpload: React.FC<Props> = ({
   onRemoved,
   disabled = false,
   maxSizeMb = 10,
-  accept = ['image/png', 'image/jpeg'],
+  accept = ["image/png", "image/jpeg"],
+  initialImageUrl,
+  initialImageId,
+  getAccessToken,
 }) => {
   const inputRef = useRef<HTMLInputElement | null>(null);
-  const [localUrl, setLocalUrl] = useState<string | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const protectedUrl = useProtectedImage(initialImageUrl ?? undefined, getAccessToken);
 
   const openPicker = () => inputRef.current?.click();
 
   const handleFile = async (file: File) => {
-    const msg = validateImage(file, maxSizeMb, accept);
-    if (msg) {
-      setError(msg);
-      return;
+    const errorMessage = validateImage(file, maxSizeMb, accept);
+    if (errorMessage) {
+      return setError(errorMessage);
     }
-    setError(null);
 
+    setError(null);
     const url = URL.createObjectURL(file);
-    setLocalUrl(url);
+    setPreviewUrl(url);
 
     try {
       setUploading(true);
-      const res = await uploader(file);
-      onUploaded(res.id);
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Upload failed';
-      setLocalUrl(null);
-      setError(message);
+      const response = await uploader(file);
+      onUploaded(response.id);
+    } catch (error) {
+      setPreviewUrl(null);
+      setError(error instanceof Error ? error.message : "Upload failed");
     } finally {
       setUploading(false);
     }
   };
 
-  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      handleFile(file);
-    }
-  };
-
   const remove = () => {
-    if (localUrl) {
-      URL.revokeObjectURL(localUrl);
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
     }
-    setLocalUrl(null);
+    setPreviewUrl(null);
     setError(null);
     onRemoved?.();
   };
 
   useEffect(() => {
-    return () => {
-      if (localUrl) {
-        URL.revokeObjectURL(localUrl);
-      }
-    };
-  }, [localUrl]);
+    if (protectedUrl) {
+      setPreviewUrl(protectedUrl);
+    }
+  }, [protectedUrl]);
+
+  useEffect(() => {
+    if (!initialImageId) {
+      setPreviewUrl(null);
+    }
+  }, [initialImageId]);
 
   return (
     <Box
       sx={{
-        border: '2px dashed',
-        borderColor: 'divider',
+        border: "2px dashed",
+        borderColor: "divider",
         borderRadius: 2,
         p: 3,
-        textAlign: 'center',
+        textAlign: "center",
       }}
     >
       <input
         ref={inputRef}
         type="file"
-        accept={accept.join(',')}
+        accept={accept.join(",")}
         hidden
-        onChange={onChange}
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) {
+            handleFile(file);
+          }
+        }}
         disabled={disabled || uploading}
       />
 
       <Stack spacing={2} alignItems="center">
-        {!localUrl ? (
+        {!previewUrl ? (
           <>
             <Typography variant="body1" color="text.secondary">
-              Upload image ({accept.join(', ')}, ≤ {maxSizeMb}MB)
+              Upload image ({accept.join(", ")}, ≤ {maxSizeMb}MB)
             </Typography>
             <Button variant="contained" onClick={openPicker} disabled={disabled || uploading}>
-              {uploading ? 'Uploading…' : 'Add image'}
+              {uploading ? "Uploading…" : "Add image"}
             </Button>
           </>
         ) : (
           <>
             <Box
               component="img"
-              src={localUrl}
+              src={previewUrl}
               alt="preview"
               sx={{ maxWidth: 320, maxHeight: 240, borderRadius: 1 }}
             />

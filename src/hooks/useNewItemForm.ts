@@ -1,91 +1,32 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
-import { toast } from 'react-toastify';
-import { ItemApi, CreateItemRequest } from '../services/items';
-import { ImageApi } from '../services/images';
-import { useAuth0 } from '@auth0/auth0-react';
-
-export type FormValues = {
-  name: string;
-  description?: string | null;
-  container_id: number | null;
-  tags: number[];
-};
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import { ItemApiService } from "../services/item-api-service";
+import { useItemFormBase } from "./useItemFormBase";
+import { ItemFormValues } from "../components/ItemForm";
 
 export function useNewItemForm() {
-  const { getAccessTokenSilently } = useAuth0();
   const navigate = useNavigate();
+  const form = useItemFormBase();
 
-  const [saving, setSaving] = useState(false);
-  const [lastContainerId, setLastContainerId] = useState<number | null>(null);
-  const [imageId, setImageId] = useState<number | null>(null);
-
-  const form = useForm<FormValues>({
-    defaultValues: { name: '', description: '', container_id: lastContainerId, tags: [] },
-    mode: 'onBlur',
-  });
-
-  const buildItemData = (): CreateItemRequest => {
-    const v = form.getValues();
-    if (!v.container_id) {
-      throw new Error('Container is required');
-    }
-    return {
-      name: v.name.trim(),
-      description: v.description?.trim() || null,
-      container_id: v.container_id,
-      image_id: imageId,
-      tags: v.tags,
-    };
-  };
-
-  const saveItem = async (closeAfterSave = true) => {
+  const saveItem = async (data: ItemFormValues, closeAfter: boolean) => {
     try {
-      setSaving(true);
-      const itemData = buildItemData();
-      await ItemApi.createItem(itemData);
-
-      if (closeAfterSave) {
-        toast.success('Item added successfully');
-        navigate('/dashboard');
+      await ItemApiService.createItem({ ...data, tags: data.tags ?? [] });
+      toast.success("Item created successfully");
+      if (closeAfter) {
+        navigate("/dashboard");
       } else {
-        const keepContainer = form.getValues('container_id');
-        setLastContainerId(keepContainer);
         form.reset({
-          name: '',
-          description: '',
-          container_id: keepContainer,
-          tags: []
+          name: "",
+          description: null,
+          container_id: data.container_id,
+          tags: [],
+          image_id: null,
         });
-        setImageId(null);
-        toast.success('Item added successfully');
       }
-    } catch (e: unknown) {
-      const message = e instanceof Error ? e.message : 'Failed to save item';
-      toast.error(message);
-    } finally {
-      setSaving(false);
+    } catch {
+      toast.error("Failed to create item");
     }
   };
 
-  const uploadImage = async (file: File) => {
-    return ImageApi.uploadImage(file, () =>
-      getAccessTokenSilently({
-        authorizationParams: {
-          audience: import.meta.env.VITE_AUTH0_AUDIENCE,
-        },
-      })
-    );
-  };
-
-  return {
-    form,
-    saving,
-    setSaving,
-    imageId,
-    setImageId,
-    saveItem,
-    uploadImage
-  };
+  return { form, loading: false, saveItem };
 }

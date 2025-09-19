@@ -7,7 +7,6 @@ import { ApiService } from './services/api-service';
 
 const App: React.FC = () => {
   const theme = useTheme();
-
   const auth = useAuth0();
 
   useEffect(() => {
@@ -18,7 +17,7 @@ const App: React.FC = () => {
         },
       })
     );
-  }, [auth.getAccessTokenSilently]);
+  }, []);
 
   return (
     <Suspense fallback={<div>Loading...</div>}>

@@ -1,12 +1,17 @@
 import { Card, CardActionArea, CardContent, Typography, Box } from "@mui/material";
 import { ImageDisplay } from "./ImageDisplay";
+import { useNavigate } from "react-router-dom";
 
 type Props = {
+  id: number;
   name: string;
   imageUrl?: string;
+  containerName?: string;
 };
 
-export function ItemCard({ name, imageUrl }: Props) {
+export function ItemCard({ id, name, imageUrl, containerName }: Props) {
+  const navigate = useNavigate();
+
   const imageId = imageUrl ? Number(imageUrl.split("/").pop()) : null;
 
   return (
@@ -21,6 +26,11 @@ export function ItemCard({ name, imageUrl }: Props) {
         flexDirection: "column",
         height: "100%",
       }}
+      onClick={() => {
+        // navigate(`/item/${id}`)
+        navigate(`/edit-item/${id}`)
+      }
+      }
     >
       <CardActionArea sx={{ flexGrow: 1, display: "flex", flexDirection: "column" }}>
         <Box sx={{ flexGrow: 1, width: "100%" }}>
@@ -44,6 +54,16 @@ export function ItemCard({ name, imageUrl }: Props) {
           >
             {name}
           </Typography>
+          {containerName && (
+            <Typography
+              variant="subtitle2"
+              align="center"
+              noWrap
+              sx={{ fontWeight: 500 }}
+            >
+              {containerName}
+            </Typography>
+          )}
         </CardContent>
       </CardActionArea>
     </Card>

@@ -3,21 +3,20 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import AddIcon from "@mui/icons-material/Add";
 import ItemGrid from "../components/ItemGrid";
 import { ItemApiService, ItemRow } from "../services/item-api-service";
-import { TagApiService, TagRow } from "../services/tag-api-service";
+import { ContainerApiService, ContainerRow } from "../services/container-api-service";
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ContainerApiService } from "../services/container-api-service";
 
-const TagPage: React.FC = () => {
-  const { tagId } = useParams<{ tagId: string }>();
-  const [tag, setTag] = useState<TagRow | null>(null);
+const ContainerPage: React.FC = () => {
+  const { containerId } = useParams<{ containerId: string }>();
+  const [container, setContainer] = useState<ContainerRow | null>(null);
   const [items, setItems] = useState<ItemRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!tagId) {
+    if (!containerId) {
       return;
     }
 
@@ -29,34 +28,20 @@ const TagPage: React.FC = () => {
         setLoading(true);
         setError(null);
 
-        const [tagData, itemsData, containers] = await Promise.all([
-          TagApiService.getTagById(Number(tagId)),
-          ItemApiService.getItemsByTag(Number(tagId)),
-          ContainerApiService.getContainers(),
+        const [containerData, itemsData] = await Promise.all([
+          ContainerApiService.getContainerById(Number(containerId)),
+          ItemApiService.getItemsByContainer(Number(containerId)),
         ]);
 
         if (signal.aborted) {
           return;
         }
 
-        setTag(tagData);
-
-        const itemsWithContainerName = itemsData.map(item => ({
-          id: item.id,
-          name: item.name,
-          description: item.description,
-          container_id: item.container_id,
-          image_id: item.image_id,
-          tags: item.tags,
-          imageUrl: item.imageUrl,
-          containerName:
-            containers.find(c => c.id === item.container_id)?.name ?? "Unknown",
-        }));
-
-        setItems(itemsWithContainerName);
+        setContainer(containerData);
+        setItems(itemsData);
       } catch {
         if (!signal.aborted) {
-          setError("Failed to load tag or items");
+          setError("Failed to load container or items");
         }
       } finally {
         if (!signal.aborted) {
@@ -68,7 +53,7 @@ const TagPage: React.FC = () => {
     loadData();
 
     return () => controller.abort();
-  }, [tagId]);
+  }, [containerId]);
 
   return (
     <Container sx={{ py: 2 }}>
@@ -77,7 +62,7 @@ const TagPage: React.FC = () => {
           <ArrowBackIcon />
         </IconButton>
         <Typography variant="h6" sx={{ ml: 1 }}>
-          {tag ? `Tag: ${tag.name}` : "Tag"}
+          {container ? `Container: ${container.name}` : "Container"}
         </Typography>
       </Box>
 
@@ -102,4 +87,4 @@ const TagPage: React.FC = () => {
   );
 };
 
-export default TagPage;
+export default ContainerPage;

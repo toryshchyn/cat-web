@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 
 export function useResourceAutocomplete<T extends { id: number; name: string }>(
   fetchAll: () => Promise<T[]>,
@@ -7,45 +7,39 @@ export function useResourceAutocomplete<T extends { id: number; name: string }>(
   const [options, setOptions] = useState<T[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const addOne = async (name: string): Promise<T | null> => {
+  const refresh = useCallback(async () => {
+    setLoading(true);
     try {
-      const created = await createOne({ name });
-      if (created) {
-        setOptions(prev => {
-          if (prev.some(o => o.id === created.id)) {
-            return prev;
-          }
-          return [created, ...prev];
-        });
-        return created;
-      }
-    } catch (e) {
-      console.error('Create failed', e);
+      const list = await fetchAll();
+      setOptions(list);
+    } finally {
+      setLoading(false);
+    }
+  }, [fetchAll]);
+
+  const addOne = async (name: string): Promise<T | null> => {
+    const created = await createOne({ name });
+    if (created) {
+      setOptions(prev =>
+        prev.some(o => o.id === created.id) ? prev : [created, ...prev]
+      );
+      return created;
     }
     return null;
   };
 
   useEffect(() => {
-    let mounted = true;
-
     (async () => {
+      setLoading(true);
       try {
-        setLoading(true);
         const list = await fetchAll();
-        if (mounted) {
-          setOptions(list);
-        }
-      } catch (err) {
-        console.error("Failed to fetch resources", err);
+        setOptions(list);
       } finally {
-        if (mounted) {
-          setLoading(false);
-        }
+        setLoading(false);
       }
     })();
-
-    return () => { mounted = false; };
   }, []);
 
-  return { options, loading, addOne };
+  return { options, loading, addOne, refresh };
 }
+
