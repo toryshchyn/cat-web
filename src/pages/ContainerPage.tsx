@@ -79,7 +79,7 @@ const ContainerPage: React.FC = () => {
       <Fab
         color="primary"
         sx={{ position: "fixed", bottom: 16, right: 16 }}
-        onClick={() => navigate("/new-item")}
+        onClick={() => navigate("/new-item", { state: { containerId: Number(containerId) } })}
       >
         <AddIcon />
       </Fab>

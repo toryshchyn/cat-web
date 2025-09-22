@@ -27,8 +27,7 @@ export function ItemCard({ id, name, imageUrl, containerName }: Props) {
         height: "100%",
       }}
       onClick={() => {
-        // navigate(`/item/${id}`)
-        navigate(`/edit-item/${id}`)
+        navigate(`/item/${id}`)
       }
       }
     >

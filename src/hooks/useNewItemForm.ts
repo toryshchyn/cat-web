@@ -4,9 +4,17 @@ import { ItemApiService } from "../services/item-api-service";
 import { useItemFormBase } from "./useItemFormBase";
 import { ItemFormValues } from "../components/ItemForm";
 
-export function useNewItemForm() {
+type Defaults = {
+  tagId?: number;
+  containerId?: number;
+};
+
+export function useNewItemForm(defaults: Defaults = {}) {
   const navigate = useNavigate();
-  const form = useItemFormBase();
+  const form = useItemFormBase({
+    tags: defaults.tagId ? [defaults.tagId] : [],
+    container_id: defaults.containerId ?? 0,
+  });
 
   const saveItem = async (data: ItemFormValues, closeAfter: boolean) => {
     try {
@@ -18,8 +26,8 @@ export function useNewItemForm() {
         form.reset({
           name: "",
           description: null,
-          container_id: data.container_id,
-          tags: [],
+          container_id: defaults.containerId ?? data.container_id,
+          tags: defaults.tagId ? [defaults.tagId] : [],
           image_id: null,
         });
       }
