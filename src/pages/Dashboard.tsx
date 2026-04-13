@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { Container, Box, Button, CircularProgress, Typography } from '@mui/material';
-import { useAuth0 } from '@auth0/auth0-react';
+import { Container, Box, CircularProgress, Typography } from '@mui/material';
 import ViewToggle from "../components/dashboard/ViewToggle";
 import TagList from "../components/dashboard/TagList";
 import TagCloud from "../components/dashboard/TagCloud";
@@ -8,20 +7,12 @@ import { useNavigate } from "react-router-dom";
 import { useTagsWithCounts } from "../hooks/useTagsWithCounts";
 
 const Dashboard: React.FC = () => {
-    const { user, logout } = useAuth0();
     const [viewMode, setViewMode] = useState<"cloud" | "list">("cloud");
     const navigate = useNavigate();
     const { tags, loading, error } = useTagsWithCounts();
 
     return (
         <Box sx={{ my: 4 }}>
-            <Typography variant="h4" component="h1" gutterBottom>
-                Dashboard
-            </Typography>
-            <Typography variant="h2" component="h2" gutterBottom>
-                Welcome, {user?.name}
-            </Typography>
-
             <Container sx={{ py: 2 }}>
 
                 <ViewToggle mode={viewMode} onChange={setViewMode} />
@@ -48,10 +39,6 @@ const Dashboard: React.FC = () => {
                     )}
                 </Box>
             </Container>
-
-            <Button onClick={() => logout({ logoutParams: { returnTo: window.location.origin } })}>
-                Logout
-            </Button>
         </Box>
     );
 };
