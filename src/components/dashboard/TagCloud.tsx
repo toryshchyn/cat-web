@@ -1,4 +1,4 @@
-import { Box, Typography } from "@mui/material";
+import { Box, Typography, useMediaQuery, useTheme } from "@mui/material";
 import { TagWithCount } from "../../services/tag-api-service";
 import { useNavigate } from "react-router-dom";
 
@@ -9,13 +9,15 @@ type Props = {
 
 export default function TagCloud({ tags }: Props) {
   const navigate = useNavigate();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const max = Math.max(...tags.map((t) => t.count), 1);
   const min = Math.min(...tags.map((t) => t.count), 0);
 
   const getFontSize = (count: number) => {
-    const minSize = 0.4;
-    const maxSize = 3;
+    const minSize = isMobile ? 0.38 : 0.62;
+    const maxSize = isMobile ? 1.2 : 1.75;
     if (max === min) {
       return `${(minSize + maxSize) / 2}rem`;
     }

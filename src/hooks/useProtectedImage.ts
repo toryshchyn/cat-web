@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 
+const protectedImageBlobCache = new Map<string, Promise<Blob | null>>();
+
 /**
  * Loads a protected image URL into an object URL.
  * The token getter is kept in a ref so callers can pass inline lambdas
@@ -36,22 +38,27 @@ export function useProtectedImage(url?: string, getAccessToken?: () => Promise<s
       }
 
       try {
-        const token = await getToken();
-        const response = await fetch(url, {
-          headers: { Authorization: `Bearer ${token}` },
-          signal: controller.signal,
-        });
+        if (!protectedImageBlobCache.has(url)) {
+          protectedImageBlobCache.set(
+            url,
+            (async () => {
+              const token = await getToken();
+              const response = await fetch(url, {
+                headers: { Authorization: `Bearer ${token}` },
+              });
+              if (!response.ok) {
+                return null;
+              }
+              return response.blob();
+            })()
+          );
+        }
 
+        const blob = await protectedImageBlobCache.get(url)!;
         if (controller.signal.aborted) {
           return;
         }
-
-        if (!response.ok) {
-          return;
-        }
-
-        const blob = await response.blob();
-        if (controller.signal.aborted) {
+        if (!blob) {
           return;
         }
 

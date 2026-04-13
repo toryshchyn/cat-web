@@ -1,17 +1,21 @@
 import React, { useState } from 'react';
-import { AppBar, Toolbar, IconButton, Typography, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Box, Container } from '@mui/material';
+import { AppBar, Toolbar, IconButton, Typography, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Box, Container, Tooltip, ClickAwayListener, useMediaQuery, useTheme } from '@mui/material';
 import Inventory2Icon from '@mui/icons-material/Inventory2';
 import MenuIcon from '@mui/icons-material/Menu';
 import HomeIcon from '@mui/icons-material/Home';
 import LogoutIcon from '@mui/icons-material/Logout';
 import ApiIcon from '@mui/icons-material/Api';
 import AddIcon from '@mui/icons-material/Add';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import { Outlet, Link } from 'react-router-dom';
 import { useAuth0 } from '@auth0/auth0-react';
 
 const MasterLayout: React.FC = () => {
     const [drawerOpen, setDrawerOpen] = useState(false);
+    const [emailTooltipOpen, setEmailTooltipOpen] = useState(false);
     const { user, isAuthenticated, isLoading, loginWithPopup, logout } = useAuth0();
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
     const toggleDrawer = () => {
         setDrawerOpen(!drawerOpen);
@@ -20,20 +24,35 @@ const MasterLayout: React.FC = () => {
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
             <AppBar position="static">
-                <Toolbar sx={{ justifyContent: 'space-between' }}>
+                <Toolbar sx={{ justifyContent: 'space-between', minHeight: { xs: 48, sm: 64 } }}>
                     <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                        <Inventory2Icon sx={{ mr: 1 }} />
-                        <Typography variant="h6" component="div">
-                            Inventory catalogue
-                        </Typography>
+                        <Inventory2Icon sx={{ mr: isMobile ? 0 : 1 }} />
+                        {!isMobile && (
+                            <Typography variant="h6" component="div">
+                                Inventory catalogue
+                            </Typography>
+                        )}
                     </Box>
                     {isAuthenticated && !isLoading && (
                         <Box display="flex" alignItems="center">
-                            <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                <Typography variant="body1" sx={{ mr: 2 }}>
-                                    {user?.name}
-                                </Typography>
-                            </Box>
+                            <ClickAwayListener onClickAway={() => setEmailTooltipOpen(false)}>
+                                <Tooltip
+                                    title={user?.email ?? 'No email'}
+                                    open={emailTooltipOpen}
+                                    disableFocusListener
+                                    disableHoverListener
+                                    disableTouchListener
+                                >
+                                    <IconButton
+                                        color="inherit"
+                                        aria-label="show user email"
+                                        onClick={() => setEmailTooltipOpen((prev) => !prev)}
+                                        sx={{ mr: 1 }}
+                                    >
+                                        <AccountCircleIcon />
+                                    </IconButton>
+                                </Tooltip>
+                            </ClickAwayListener>
                             <IconButton
                                 color="inherit"
                                 aria-label="open drawer"

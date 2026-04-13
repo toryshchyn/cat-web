@@ -7,9 +7,10 @@ type Props = {
   name: string;
   imageUrl?: string;
   containerName?: string;
+  compactText?: boolean;
 };
 
-export function ItemCard({ id, name, imageUrl, containerName }: Props) {
+export function ItemCard({ id, name, imageUrl, containerName, compactText = false }: Props) {
   const navigate = useNavigate();
 
   const imageId = imageUrl ? Number(imageUrl.split("/").pop()) : null;
@@ -46,19 +47,19 @@ export function ItemCard({ id, name, imageUrl, containerName }: Props) {
 
         <CardContent sx={{ p: 1, width: "100%" }}>
           <Typography
-            variant="body1"
+            variant={compactText ? "body2" : "body1"}
             align="center"
             noWrap
-            sx={{ fontWeight: 500 }}
+            sx={{ fontWeight: 500, fontSize: compactText ? "0.78rem" : undefined }}
           >
             {name}
           </Typography>
           {containerName && (
             <Typography
-              variant="body2"
+              variant="caption"
               align="center"
               noWrap
-              sx={{ fontWeight: 500, mt: 1}}
+              sx={{ fontWeight: 500, mt: compactText ? 0.5 : 1, fontSize: compactText ? "0.68rem" : undefined }}
             >
               Container: {containerName}
             </Typography>

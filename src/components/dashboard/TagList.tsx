@@ -1,8 +1,9 @@
-import { List, ListItemButton, ListItemText, Paper } from "@mui/material";
+import { List, ListItemButton, ListItemText, Paper, Typography } from "@mui/material";
 
 type Tag = {
   id: number;
-  name: string
+  name: string;
+  count?: number;
 };
 
 type Props = {
@@ -17,6 +18,9 @@ export default function TagList({ tags, onSelect }: Props) {
         <Paper key={tag.id} sx={{ mb: 1 }}>
           <ListItemButton onClick={() => onSelect(tag.id)}>
             <ListItemText primary={tag.name} />
+            <Typography variant="body2" color="text.secondary" sx={{ ml: 2 }}>
+              {tag.count ?? 0}
+            </Typography>
           </ListItemButton>
         </Paper>
       ))}

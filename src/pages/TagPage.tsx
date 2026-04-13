@@ -1,6 +1,9 @@
-import { Container, Typography, IconButton, Fab, CircularProgress, Box } from "@mui/material";
+import { Container, Typography, IconButton, Fab, CircularProgress, Box, ToggleButton, ToggleButtonGroup, useMediaQuery, useTheme } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import AddIcon from "@mui/icons-material/Add";
+import ViewAgendaOutlinedIcon from "@mui/icons-material/ViewAgendaOutlined";
+import GridViewOutlinedIcon from "@mui/icons-material/GridViewOutlined";
+import ViewListOutlinedIcon from "@mui/icons-material/ViewListOutlined";
 import ItemGrid from "../components/shared/ItemGrid";
 import { ItemApiService, ItemRow } from "../services/item-api-service";
 import { TagApiService, TagRow } from "../services/tag-api-service";
@@ -13,9 +16,13 @@ const TagPage: React.FC = () => {
   const { tagId } = useParams<{ tagId: string }>();
   const [tag, setTag] = useState<TagRow | null>(null);
   const [items, setItems] = useState<ItemRow[]>([]);
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [mobileColumns, setMobileColumns] = useState<1 | 2>(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   useEffect(() => {
     if (!tagId) {
@@ -82,7 +89,43 @@ const TagPage: React.FC = () => {
       ) : error ? (
         <Typography color="error">{error}</Typography>
       ) : (
-        <ItemGrid items={items} />
+        <>
+          <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1, gap: 1 }}>
+            <ToggleButtonGroup
+              exclusive
+              value={viewMode}
+              onChange={(_, next) => next && setViewMode(next)}
+              size="small"
+            >
+              <ToggleButton value="grid" aria-label="grid view">
+                <GridViewOutlinedIcon fontSize="small" />
+              </ToggleButton>
+              <ToggleButton value="list" aria-label="list view">
+                <ViewListOutlinedIcon fontSize="small" />
+              </ToggleButton>
+            </ToggleButtonGroup>
+            {isMobile && viewMode === "grid" && (
+              <ToggleButtonGroup
+                exclusive
+                value={mobileColumns}
+                onChange={(_, next) => next && setMobileColumns(next)}
+                size="small"
+              >
+                <ToggleButton value={1} aria-label="one item per row">
+                  <ViewAgendaOutlinedIcon fontSize="small" />
+                </ToggleButton>
+                <ToggleButton value={2} aria-label="two items per row">
+                  <GridViewOutlinedIcon fontSize="small" />
+                </ToggleButton>
+              </ToggleButtonGroup>
+            )}
+          </Box>
+          <ItemGrid
+            items={items}
+            viewMode={viewMode}
+            mobileColumns={isMobile && viewMode === "grid" ? mobileColumns : 1}
+          />
+        </>
       )}
 
       <Fab
