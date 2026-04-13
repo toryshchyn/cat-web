@@ -1,4 +1,4 @@
-import { Container, Typography, IconButton, Fab, CircularProgress, Box, ToggleButton, ToggleButtonGroup, useMediaQuery, useTheme } from "@mui/material";
+import { Typography, IconButton, Fab, CircularProgress, Box, ToggleButton, ToggleButtonGroup, useMediaQuery, useTheme } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import AddIcon from "@mui/icons-material/Add";
 import ViewAgendaOutlinedIcon from "@mui/icons-material/ViewAgendaOutlined";
@@ -63,7 +63,7 @@ const ContainerPage: React.FC = () => {
   }, [containerId]);
 
   return (
-    <Container sx={{ py: 2 }}>
+    <Box sx={{ py: 2 }}>
       <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
         <IconButton onClick={() => navigate(-1)}>
           <ArrowBackIcon />
@@ -126,7 +126,7 @@ const ContainerPage: React.FC = () => {
       >
         <AddIcon />
       </Fab>
-    </Container>
+    </Box>
   );
 };
 

@@ -1,5 +1,5 @@
 import React from "react";
-import { Container, Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { useNewItemForm } from "../hooks/useNewItemForm";
 import ItemForm from "../components/item-form/ItemForm";
 import { useLocation } from "react-router-dom";
@@ -18,7 +18,7 @@ const NewItemPage: React.FC = () => {
   });
 
   return (
-    <Container maxWidth="sm" sx={{ py: 4 }}>
+    <Box sx={{ maxWidth: 600, mx: "auto", pt: 4, pb: 4 }}>
       <Typography variant="h5" gutterBottom>
         New item
       </Typography>
@@ -29,7 +29,7 @@ const NewItemPage: React.FC = () => {
         onSubmit={saveItem}
         mode="new"
       />
-    </Container>
+    </Box>
   );
 };
 

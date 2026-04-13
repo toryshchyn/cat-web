@@ -146,7 +146,7 @@ const MasterLayout: React.FC = () => {
                 </Box>
             </Drawer>
 
-            <Container component="main" sx={{ flexGrow: 1, py: 3 }}>
+            <Container id="main-container" component="main" sx={{ flexGrow: 1, pt: 0.5, pb: 3 }}>
                 <Outlet />
             </Container>
         </Box>

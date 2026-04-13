@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Container, Typography, IconButton, CircularProgress, Box, Card, CardContent, Divider, Stack, Button, Grid } from "@mui/material";
+import { Typography, IconButton, CircularProgress, Box, Card, CardContent, Divider, Stack, Button, Grid } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -68,7 +68,7 @@ const ItemDetailsPage: React.FC = () => {
   };
 
   return (
-    <Container sx={{ py: 2 }}>
+    <Box sx={{ py: 2 }}>
       <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
         <IconButton onClick={() => navigate(-1)}>
           <ArrowBackIcon />
@@ -158,7 +158,7 @@ const ItemDetailsPage: React.FC = () => {
           </CardContent>
         </Card>
       )}
-    </Container>
+    </Box>
   );
 };
 

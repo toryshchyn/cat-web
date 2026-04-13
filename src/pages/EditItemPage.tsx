@@ -1,5 +1,5 @@
 import React from "react";
-import { Container, Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { useEditItemForm } from "../hooks/useEditItemForm";
 import ItemForm from "../components/item-form/ItemForm";
 
@@ -12,7 +12,7 @@ const EditItemPage: React.FC = () => {
   } = useEditItemForm();
 
   return (
-    <Container maxWidth="sm" sx={{ py: 4 }}>
+    <Box sx={{ maxWidth: 600, mx: "auto", py: 4 }}>
       <Typography variant="h5" gutterBottom>
         Edit item
       </Typography>
@@ -24,7 +24,7 @@ const EditItemPage: React.FC = () => {
         mode="edit"
         initialImageUrl={initialImageUrl}
       />
-    </Container>
+    </Box>
   );
 };
 

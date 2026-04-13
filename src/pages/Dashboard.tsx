@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Container, Box, CircularProgress, Typography } from '@mui/material';
+import { Box, CircularProgress, Typography } from '@mui/material';
 import ViewToggle from "../components/dashboard/ViewToggle";
 import TagList from "../components/dashboard/TagList";
 import TagCloud from "../components/dashboard/TagCloud";
@@ -13,7 +13,7 @@ const Dashboard: React.FC = () => {
 
     return (
         <Box sx={{ my: 4 }}>
-            <Container sx={{ py: 2 }}>
+            <Box sx={{ py: 2 }}>
 
                 <ViewToggle mode={viewMode} onChange={setViewMode} />
 
@@ -38,7 +38,7 @@ const Dashboard: React.FC = () => {
                         )
                     )}
                 </Box>
-            </Container>
+            </Box>
         </Box>
     );
 };
