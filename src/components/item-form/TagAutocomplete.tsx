@@ -1,5 +1,5 @@
 import { FieldValues } from 'react-hook-form';
-import { TagRow, TagApiService } from '../services/tag-api-service';
+import { TagRow, TagApiService } from '../../services/tag-api-service';
 import { ResourceAutocomplete } from './ResourceAutocomplete';
 
 type TagAutocompleteProps<FV extends FieldValues> = Omit<

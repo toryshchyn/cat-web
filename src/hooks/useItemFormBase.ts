@@ -1,5 +1,5 @@
 import { useForm } from "react-hook-form";
-import { ItemFormValues } from "../components/ItemForm";
+import { ItemFormValues } from "../components/item-form/ItemForm";
 
 export function useItemFormBase(defaultValues?: Partial<ItemFormValues>) {
   const form = useForm<ItemFormValues>({

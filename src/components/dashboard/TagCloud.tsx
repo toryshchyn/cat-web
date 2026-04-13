@@ -1,5 +1,5 @@
 import { Box, Typography } from "@mui/material";
-import { TagWithCount } from "../services/tag-api-service";
+import { TagWithCount } from "../../services/tag-api-service";
 import { useNavigate } from "react-router-dom";
 
 type Props = {

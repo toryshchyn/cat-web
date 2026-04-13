@@ -1,7 +1,7 @@
 import { Container, Typography, IconButton, Fab, CircularProgress, Box } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import AddIcon from "@mui/icons-material/Add";
-import ItemGrid from "../components/ItemGrid";
+import ItemGrid from "../components/shared/ItemGrid";
 import { ItemApiService, ItemRow } from "../services/item-api-service";
 import { ContainerApiService, ContainerRow } from "../services/container-api-service";
 import React, { useEffect, useState } from "react";

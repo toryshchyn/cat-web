@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
 import { Box, Button, FormControl, InputLabel, MenuItem, Select } from '@mui/material';
 import { toast } from 'react-toastify';
-import useApiService from '../hooks/useApiService';
-import { ContainerApiService } from '../services/container-api-service';
+import useApiService from '../../hooks/useApiService';
+import { ContainerApiService } from '../../services/container-api-service';
 import { useAuth0 } from '@auth0/auth0-react';
 
 const ApiTesting: React.FC = () => {

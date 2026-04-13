@@ -4,9 +4,9 @@ import { Controller, UseFormReturn } from "react-hook-form";
 import { ContainerAutocomplete } from "./ContainerAutocomplete";
 import { TagAutocomplete } from "./TagAutocomplete";
 import ImageUpload from "./ImageUpload";
-import { UploadResponse } from "../services/image-api-service";
+import { UploadResponse } from "../../services/image-api-service";
 import { useNavigate } from "react-router-dom";
-import { ItemApiService } from "../services/item-api-service";
+import { ItemApiService } from "../../services/item-api-service";
 
 export type ItemFormValues = {
   name: string;
@@ -99,7 +99,7 @@ const ItemForm: React.FC<Props> = ({
             <Grid size={{ xs: 12 }} display="flex" justifyContent="center">
               <ImageUpload
                 uploader={async (file: File): Promise<UploadResponse> => {
-                  const response = await import("../services/image-api-service").then(
+                  const response = await import("../../services/image-api-service").then(
                     (m) => m.ImageApiService.uploadImage(file)
                   );
                   return response;

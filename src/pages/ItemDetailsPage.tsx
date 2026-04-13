@@ -8,7 +8,7 @@ import { useParams, useNavigate, Link as RouterLink } from "react-router-dom";
 import { ItemApiService, ItemRow } from "../services/item-api-service";
 import { ContainerApiService } from "../services/container-api-service";
 import { withContainerNames } from "../services/with-container-names";
-import { ImageDisplay } from "../components/ImageDisplay";
+import { ImageDisplay } from "../components/shared/ImageDisplay";
 
 const ItemDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();

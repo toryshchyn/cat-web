@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import AuthGuard from './components/AuthGuard';
+import AuthGuard from './components/shared/AuthGuard';
 import Dashboard from './pages/Dashboard';
-import MasterLayout from './components/MasterLayout';
+import MasterLayout from './components/shared/MasterLayout';
 import ApiTests from './pages/ApiTests/ApiTests';
 import EditItemPage from './pages/EditItemPage';
 import NewItemPage from './pages/NewItemPage';

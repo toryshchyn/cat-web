@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { ItemApiService } from "../services/item-api-service";
 import { useItemFormBase } from "./useItemFormBase";
-import { ItemFormValues } from "../components/ItemForm";
+import { ItemFormValues } from "../components/item-form/ItemForm";
 
 type Defaults = {
   tagId?: number;

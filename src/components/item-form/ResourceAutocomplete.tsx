@@ -1,5 +1,5 @@
 import { Control, FieldValues, Path } from 'react-hook-form';
-import { useResourceAutocomplete } from '../hooks/useResourceAutocomplete';
+import { useResourceAutocomplete } from '../../hooks/useResourceAutocomplete';
 import { BaseAutocomplete } from './BaseAutocomplete';
 
 type Props<FV extends FieldValues, T extends { id: number; name: string }> = {

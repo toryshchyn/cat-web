@@ -1,5 +1,5 @@
 import { Grid } from "@mui/material";
-import { ItemRow } from "../services/item-api-service";
+import { ItemRow } from "../../services/item-api-service";
 import { ItemCard } from "./ItemCard";
 
 type Props = {

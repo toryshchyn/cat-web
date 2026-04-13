@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { ItemApiService, ItemRow } from "../services/item-api-service";
-import { ItemFormValues } from "../components/ItemForm";
+import { ItemFormValues } from "../components/item-form/ItemForm";
 import { useItemFormBase } from "./useItemFormBase";
 
 export function useEditItemForm() {

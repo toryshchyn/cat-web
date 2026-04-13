@@ -1,5 +1,5 @@
 import { FieldValues } from 'react-hook-form';
-import { ContainerRow, ContainerApiService } from '../services/container-api-service';
+import { ContainerRow, ContainerApiService } from '../../services/container-api-service';
 import { ResourceAutocomplete } from './ResourceAutocomplete';
 
 type ContainerAutocompleteProps<FV extends FieldValues> = Omit<

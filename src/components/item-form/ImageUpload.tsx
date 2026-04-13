@@ -1,8 +1,8 @@
 import React, { useRef, useState, useEffect } from "react";
 import { Box, Button, Stack, Typography } from "@mui/material";
-import { UploadResponse } from "../services/image-api-service";
-import { validateImage } from "../other/fileValidation";
-import { useProtectedImage } from "../hooks/useProtectedImage";
+import { UploadResponse } from "../../services/image-api-service";
+import { validateImage } from "../../other/fileValidation";
+import { useProtectedImage } from "../../hooks/useProtectedImage";
 
 type Props = {
   uploader: (file: File) => Promise<UploadResponse>;

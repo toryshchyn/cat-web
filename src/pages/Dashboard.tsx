@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Container, Box, Button, CircularProgress, Typography } from '@mui/material';
 import { useAuth0 } from '@auth0/auth0-react';
-import ViewToggle from "../components/ViewToggle";
-import TagList from "../components/TagList";
-import TagCloud from "../components/TagCloud";
+import ViewToggle from "../components/dashboard/ViewToggle";
+import TagList from "../components/dashboard/TagList";
+import TagCloud from "../components/dashboard/TagCloud";
 import { useNavigate } from "react-router-dom";
 import { useTagsWithCounts } from "../hooks/useTagsWithCounts";
 

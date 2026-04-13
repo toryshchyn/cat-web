@@ -1,5 +1,5 @@
 import { useAuth0 } from "@auth0/auth0-react";
-import { useProtectedImage } from "../hooks/useProtectedImage";
+import { useProtectedImage } from "../../hooks/useProtectedImage";
 
 type Props = {
   imageId?: number | null;

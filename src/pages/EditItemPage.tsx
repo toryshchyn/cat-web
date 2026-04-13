@@ -1,7 +1,7 @@
 import React from "react";
 import { Container, Typography } from "@mui/material";
 import { useEditItemForm } from "../hooks/useEditItemForm";
-import ItemForm from "../components/ItemForm";
+import ItemForm from "../components/item-form/ItemForm";
 
 const EditItemPage: React.FC = () => {
   const {

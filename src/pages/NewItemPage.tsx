@@ -1,7 +1,7 @@
 import React from "react";
 import { Container, Typography } from "@mui/material";
 import { useNewItemForm } from "../hooks/useNewItemForm";
-import ItemForm from "../components/ItemForm";
+import ItemForm from "../components/item-form/ItemForm";
 import { useLocation } from "react-router-dom";
 
 const NewItemPage: React.FC = () => {
