@@ -7,6 +7,7 @@ import { TagApiService, TagRow } from "../services/tag-api-service";
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ContainerApiService } from "../services/container-api-service";
+import { withContainerNames } from "../services/with-container-names";
 
 const TagPage: React.FC = () => {
   const { tagId } = useParams<{ tagId: string }>();
@@ -29,9 +30,8 @@ const TagPage: React.FC = () => {
         setLoading(true);
         setError(null);
 
-        const [tagData, itemsData, containers] = await Promise.all([
+        const [tagData, containers] = await Promise.all([
           TagApiService.getTagById(Number(tagId)),
-          ItemApiService.getItemsByTag(Number(tagId)),
           ContainerApiService.getContainers(),
         ]);
 
@@ -41,19 +41,13 @@ const TagPage: React.FC = () => {
 
         setTag(tagData);
 
-        const itemsWithContainerName = itemsData.map(item => ({
-          id: item.id,
-          name: item.name,
-          description: item.description,
-          container_id: item.container_id,
-          image_id: item.image_id,
-          tags: item.tags,
-          imageUrl: item.imageUrl,
-          containerName:
-            containers.find(c => c.id === item.container_id)?.name ?? "Unknown",
-        }));
+        const itemsData = await ItemApiService.getItemsByTag(Number(tagId));
 
-        setItems(itemsWithContainerName);
+        if (signal.aborted) {
+          return;
+        }
+
+        setItems(withContainerNames(itemsData, containers));
       } catch {
         if (!signal.aborted) {
           setError("Failed to load tag or items");

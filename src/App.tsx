@@ -1,12 +1,12 @@
 import './App.css'
-import { ThemeProvider, useTheme } from '@mui/material';
+import { CssBaseline, ThemeProvider } from '@mui/material';
 import AppRoutes from './AppRoutes';
 import { Suspense, useEffect } from 'react';
 import { useAuth0 } from '@auth0/auth0-react';
 import { ApiService } from './services/api-service';
+import { appTheme } from './theme';
 
 const App: React.FC = () => {
-  const theme = useTheme();
   const auth = useAuth0();
 
   useEffect(() => {
@@ -20,11 +20,18 @@ const App: React.FC = () => {
   }, []);
 
   return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <ThemeProvider theme={theme}>
+    <ThemeProvider theme={appTheme}>
+      <CssBaseline />
+      <Suspense
+        fallback={
+          <div style={{ padding: 24, color: appTheme.palette.text.secondary }}>
+            Loading…
+          </div>
+        }
+      >
         <AppRoutes />
-      </ThemeProvider>
-    </Suspense>
+      </Suspense>
+    </ThemeProvider>
   );
 }
 

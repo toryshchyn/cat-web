@@ -11,6 +11,7 @@ import App from './App.tsx'
 
 import { Auth0Provider } from '@auth0/auth0-react';
 import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

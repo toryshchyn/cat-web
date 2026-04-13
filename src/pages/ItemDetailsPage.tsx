@@ -7,6 +7,7 @@ import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import { useParams, useNavigate, Link as RouterLink } from "react-router-dom";
 import { ItemApiService, ItemRow } from "../services/item-api-service";
 import { ContainerApiService } from "../services/container-api-service";
+import { withContainerNames } from "../services/with-container-names";
 import { ImageDisplay } from "../components/ImageDisplay";
 
 const ItemDetailsPage: React.FC = () => {
@@ -38,12 +39,7 @@ const ItemDetailsPage: React.FC = () => {
           return;
         }
 
-        const container = containers.find(c => c.id === itemData.container_id);
-
-        setItem({
-          ...itemData,
-          containerName: container?.name ?? "Unknown",
-        });
+        setItem(withContainerNames([itemData], containers)[0]);
       } catch {
         if (!signal.aborted) {
           setError("Failed to load item");

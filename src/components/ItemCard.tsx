@@ -46,7 +46,7 @@ export function ItemCard({ id, name, imageUrl, containerName }: Props) {
 
         <CardContent sx={{ p: 1, width: "100%" }}>
           <Typography
-            variant="subtitle2"
+            variant="body1"
             align="center"
             noWrap
             sx={{ fontWeight: 500 }}
@@ -55,12 +55,12 @@ export function ItemCard({ id, name, imageUrl, containerName }: Props) {
           </Typography>
           {containerName && (
             <Typography
-              variant="subtitle2"
+              variant="body2"
               align="center"
               noWrap
-              sx={{ fontWeight: 500 }}
+              sx={{ fontWeight: 500, mt: 1}}
             >
-              {containerName}
+              Container: {containerName}
             </Typography>
           )}
         </CardContent>
