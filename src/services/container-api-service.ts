@@ -13,6 +13,12 @@ export type ContainerRow = {
   updated_at: string | null;
 };
 
+export type ContainerWithCount = {
+  id: number;
+  name: string;
+  count: number;
+};
+
 export class ContainerApiService extends ApiService {
   static async createContainer(body: CreateContainerRequest) {
     try {
@@ -37,6 +43,10 @@ export class ContainerApiService extends ApiService {
 
   static async getContainers() {
     return super.request<ContainerRow[]>("/api/containers");
+  }
+
+  static async getContainersWithCounts() {
+    return super.request<ContainerWithCount[]>("/api/containers/with-counts");
   }
 
   static async getContainerById(id: number) {

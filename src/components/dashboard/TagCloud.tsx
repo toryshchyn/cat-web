@@ -1,19 +1,16 @@
 import { Box, Typography, useMediaQuery, useTheme } from "@mui/material";
-import { TagWithCount } from "../../services/tag-api-service";
-import { useNavigate } from "react-router-dom";
 
 type Props = {
-  tags: TagWithCount[];
+  tags: { id: number; name: string; count?: number }[];
   onSelect: (id: number) => void;
 };
 
-export default function TagCloud({ tags }: Props) {
-  const navigate = useNavigate();
+export default function TagCloud({ tags, onSelect }: Props) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
-  const max = Math.max(...tags.map((t) => t.count), 1);
-  const min = Math.min(...tags.map((t) => t.count), 0);
+  const max = Math.max(...tags.map((t) => t.count ?? 1), 1);
+  const min = Math.min(...tags.map((t) => t.count ?? 1), 1);
 
   const getFontSize = (count: number) => {
     const minSize = isMobile ? 0.38 : 0.62;
@@ -21,7 +18,7 @@ export default function TagCloud({ tags }: Props) {
     if (max === min) {
       return `${(minSize + maxSize) / 2}rem`;
     }
-    const ratio = (count - min) / (max - min);
+    const ratio = ((count ?? 1) - min) / (max - min);
     return `${minSize + ratio * (maxSize - minSize)}rem`;
   };
 
@@ -39,9 +36,9 @@ export default function TagCloud({ tags }: Props) {
       {tags.map((tag) => (
         <Typography
           key={tag.id}
-          onClick={() => navigate(`/tag/${tag.id}`)}
+          onClick={() => onSelect(tag.id)}
           sx={{
-            fontSize: getFontSize(tag.count),
+            fontSize: getFontSize(tag.count ?? 1),
             cursor: "pointer",
             "&:hover": {
               color: "primary.main",

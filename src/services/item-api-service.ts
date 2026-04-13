@@ -53,6 +53,19 @@ export class ItemApiService extends ApiService {
     return data.map(mapItem);
   }
 
+  static async searchItemsByName(name: string): Promise<ItemRow[]> {
+    const data = await super.request<ItemResponse[]>(
+      `/api/items/search?name=${encodeURIComponent(name)}`
+    );
+    return data.map(mapItem);
+  }
+
+  static async getItemNameSuggestions(q: string): Promise<string[]> {
+    return super.request<string[]>(
+      `/api/items/name-suggestions?q=${encodeURIComponent(q)}`
+    );
+  }
+
   static async updateItem(id: number, body: Partial<ItemRow>) {
     return super.request<ItemRow>(`/api/item/${id}`, {
       method: "PUT",
