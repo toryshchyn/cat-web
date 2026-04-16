@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import { ItemApiService, ItemRow } from "../services/item-api-service";
 import { ItemFormValues } from "../components/item-form/ItemForm";
 import { useItemFormBase } from "./useItemFormBase";
+import { resolveContainerIdForItem } from "../utils/resolve-container-for-item";
 
 export function useEditItemForm() {
   const { itemId } = useParams<{ itemId: string }>();
@@ -20,7 +21,11 @@ export function useEditItemForm() {
     setLoading(true);
     ItemApiService.getItemById(Number(itemId))
       .then((item: ItemRow) => {
-        form.reset(item);
+        form.reset({
+          ...item,
+          tags: item.tags ?? [],
+          container_input: "",
+        });
         setInitialImageUrl(item.imageUrl ?? null);
       })
       .finally(() => setLoading(false));
@@ -31,12 +36,18 @@ export function useEditItemForm() {
       return;
     }
     try {
-      await ItemApiService.updateItem(Number(itemId), { ...data, tags: data.tags ?? [] });
+      const container_id = await resolveContainerIdForItem(data);
+      const { container_input: _ci, ...rest } = data;
+      await ItemApiService.updateItem(Number(itemId), {
+        ...rest,
+        container_id,
+        tags: data.tags ?? [],
+      });
       toast.success("Item updated successfully");
       if (closeAfter) {
         navigate("/dashboard");
       } else {
-        form.reset(data);
+        form.reset({ ...data, container_id, container_input: "" });
       }
     } catch {
       toast.error("Failed to update item");

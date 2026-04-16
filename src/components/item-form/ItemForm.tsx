@@ -1,6 +1,6 @@
 import React from "react";
 import { Button, Card, CardContent, CircularProgress, Grid, Stack, TextField } from "@mui/material";
-import { Controller, UseFormReturn } from "react-hook-form";
+import { FormProvider, UseFormReturn } from "react-hook-form";
 import { ContainerAutocomplete } from "./ContainerAutocomplete";
 import { TagAutocomplete } from "./TagAutocomplete";
 import ImageUpload from "./ImageUpload";
@@ -12,6 +12,8 @@ export type ItemFormValues = {
   name: string;
   description?: string | null;
   container_id: number;
+  /** Typed container label for resolving/creating a container when `container_id` is not set yet */
+  container_input?: string;
   tags: number[];
   image_id?: number | null;
 }
@@ -44,6 +46,7 @@ const ItemForm: React.FC<Props> = ({
   return (
     <Card>
       <CardContent>
+        <FormProvider {...form}>
         <form onSubmit={handleSubmit((data) => onSubmit(data, true))}>
           <Grid container spacing={2}>
             <Grid size={{ xs: 12, sm: 6 }}>
@@ -61,19 +64,23 @@ const ItemForm: React.FC<Props> = ({
             </Grid>
 
             <Grid size={{ xs: 12, sm: 6 }}>
-              <Controller
+              <ContainerAutocomplete
                 name="container_id"
                 control={control}
-                rules={{ required: "Container is required" }}
-                render={({ field, fieldState }) => (
-                  <ContainerAutocomplete
-                    {...field}
-                    control={control}
-                    disabled={isSubmitting}
-                    error={!!fieldState.error}
-                    helperText={fieldState.error?.message}
-                  />
-                )}
+                disabled={isSubmitting}
+                rules={{
+                  validate: (_v, values) => {
+                    const id = values.container_id;
+                    const typed = (values.container_input ?? "").trim();
+                    if (typeof id === "number" && id > 0) {
+                      return true;
+                    }
+                    if (typed.length > 0) {
+                      return true;
+                    }
+                    return "Container is required";
+                  },
+                }}
               />
             </Grid>
 
@@ -146,6 +153,7 @@ const ItemForm: React.FC<Props> = ({
             </Grid>
           </Grid>
         </form>
+        </FormProvider>
       </CardContent>
     </Card >
   );

@@ -1,4 +1,4 @@
-import { FieldValues } from 'react-hook-form';
+import { FieldValues, Path } from 'react-hook-form';
 import { ContainerRow, ContainerApiService } from '../../services/container-api-service';
 import { ResourceAutocomplete } from './ResourceAutocomplete';
 
@@ -16,5 +16,6 @@ export const ContainerAutocomplete = <FV extends FieldValues>(
     fetchAll={ContainerApiService.getContainers}
     createOne={ContainerApiService.createContainer}
     freeSolo
+    syncRawInputAs={"container_input" as Path<FV>}
   />
 );

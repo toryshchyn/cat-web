@@ -1,4 +1,4 @@
-import { Control, FieldValues, Path } from 'react-hook-form';
+import { Control, FieldValues, Path, RegisterOptions } from 'react-hook-form';
 import { useResourceAutocomplete } from '../../hooks/useResourceAutocomplete';
 import { BaseAutocomplete } from './BaseAutocomplete';
 
@@ -13,6 +13,9 @@ type Props<FV extends FieldValues, T extends { id: number; name: string }> = {
   disabled?: boolean;
   error?: boolean;
   helperText?: string;
+  rules?: RegisterOptions<FV, Path<FV>>;
+  /** When set, the current text field value is written here on each keystroke (needs `FormProvider`). */
+  syncRawInputAs?: Path<FV>;
 };
 
 export function ResourceAutocomplete<
@@ -28,7 +31,9 @@ export function ResourceAutocomplete<
   freeSolo,
   disabled,
   error,
-  helperText
+  helperText,
+  rules,
+  syncRawInputAs,
 }: Props<FV, T>) {
   const { options, loading, addOne } = useResourceAutocomplete(fetchAll, createOne);
 
@@ -45,6 +50,8 @@ export function ResourceAutocomplete<
       freeSolo={freeSolo}
       error={error}
       helperText={helperText}
+      rules={rules}
+      syncRawInputAs={syncRawInputAs}
     />
   );
 }

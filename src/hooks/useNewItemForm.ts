@@ -3,6 +3,7 @@ import { toast } from "react-toastify";
 import { ItemApiService } from "../services/item-api-service";
 import { useItemFormBase } from "./useItemFormBase";
 import { ItemFormValues } from "../components/item-form/ItemForm";
+import { resolveContainerIdForItem } from "../utils/resolve-container-for-item";
 
 type Defaults = {
   tagId?: number;
@@ -18,7 +19,13 @@ export function useNewItemForm(defaults: Defaults = {}) {
 
   const saveItem = async (data: ItemFormValues, closeAfter: boolean) => {
     try {
-      await ItemApiService.createItem({ ...data, tags: data.tags ?? [] });
+      const container_id = await resolveContainerIdForItem(data);
+      const { container_input: _ci, ...rest } = data;
+      await ItemApiService.createItem({
+        ...rest,
+        container_id,
+        tags: data.tags ?? [],
+      });
       toast.success("Item created successfully");
       if (closeAfter) {
         navigate("/dashboard");
@@ -26,7 +33,8 @@ export function useNewItemForm(defaults: Defaults = {}) {
         form.reset({
           name: "",
           description: null,
-          container_id: defaults.containerId ?? data.container_id,
+          container_id: defaults.containerId ?? container_id,
+          container_input: "",
           tags: defaults.tagId ? [defaults.tagId] : [],
           image_id: null,
         });

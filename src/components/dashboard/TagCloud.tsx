@@ -13,8 +13,8 @@ export default function TagCloud({ tags, onSelect }: Props) {
   const min = Math.min(...tags.map((t) => t.count ?? 1), 1);
 
   const getFontSize = (count: number) => {
-    const minSize = isMobile ? 0.38 : 0.62;
-    const maxSize = isMobile ? 1.2 : 1.75;
+    const minSize = isMobile ? 0.5 : 1;
+    const maxSize = isMobile ? 1.7 : 2.5;
     if (max === min) {
       return `${(minSize + maxSize) / 2}rem`;
     }

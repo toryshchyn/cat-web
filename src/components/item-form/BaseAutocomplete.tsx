@@ -1,5 +1,12 @@
 import { Autocomplete, CircularProgress, TextField } from '@mui/material';
-import { Control, Controller, FieldValues, Path } from 'react-hook-form';
+import {
+  Control,
+  Controller,
+  FieldValues,
+  Path,
+  RegisterOptions,
+  useFormContext,
+} from 'react-hook-form';
 
 type Props<FV extends FieldValues, T extends { id: number; name: string }> = {
   control: Control<FV, unknown>;
@@ -13,6 +20,8 @@ type Props<FV extends FieldValues, T extends { id: number; name: string }> = {
   addOne?: (name: string) => Promise<T | null>;
   error?: boolean;
   helperText?: string;
+  rules?: RegisterOptions<FV, Path<FV>>;
+  syncRawInputAs?: Path<FV>;
 };
 
 export function BaseAutocomplete<
@@ -29,17 +38,24 @@ export function BaseAutocomplete<
   loading,
   addOne,
   error,
-  helperText
+  helperText,
+  rules,
+  syncRawInputAs,
 }: Props<FV, T>) {
+  const form = useFormContext<FV>();
+
   return (
     <Controller
       control={control}
       name={name}
+      rules={rules}
       render={({ field, fieldState }) => {
         const selectedValue: T | T[] | null =
           multiple && Array.isArray(field.value)
             ? options.filter(o => (field.value as number[]).includes(o.id))
-            : !multiple && field.value
+            : !multiple &&
+                typeof field.value === 'number' &&
+                field.value > 0
               ? options.find(o => o.id === field.value) ?? null
               : multiple
                 ? []
@@ -56,6 +72,16 @@ export function BaseAutocomplete<
             getOptionLabel={(opt) => (typeof opt === 'string' ? opt : opt.name)}
             isOptionEqualToValue={(a, b) =>
               typeof a !== 'string' && typeof b !== 'string' && a.id === b.id
+            }
+            onInputChange={
+              syncRawInputAs
+                ? (_e, value) => {
+                    form.setValue(syncRawInputAs, value as never, {
+                      shouldValidate: true,
+                      shouldDirty: true,
+                    });
+                  }
+                : undefined
             }
             onChange={async (_e, newValue) => {
               const normalize = (s: string) => s.trim().toLocaleLowerCase();
@@ -87,7 +113,7 @@ export function BaseAutocomplete<
                 const ids = (await Promise.all(
                   [newValue as string | T | null].map(toId)
                 )).filter((id): id is number => id !== null);
-                field.onChange(ids.length ? ids[0] : null);
+                field.onChange(ids.length ? ids[0] : 0);
               }
             }}
             renderInput={(params) => (
