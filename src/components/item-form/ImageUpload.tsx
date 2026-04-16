@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect } from "react";
 import { Box, Button, Stack, Typography } from "@mui/material";
+import useMediaQuery from "@mui/material/useMediaQuery";
 import { UploadResponse } from "../../services/image-api-service";
 import { validateImage } from "../../other/fileValidation";
 import { useProtectedImage } from "../../hooks/useProtectedImage";
@@ -28,13 +29,16 @@ const ImageUpload: React.FC<Props> = ({
   getAccessToken,
 }) => {
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const cameraInputRef = useRef<HTMLInputElement | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const canUseCameraCapture = useMediaQuery("(hover: none) and (pointer: coarse)");
 
   const protectedUrl = useProtectedImage(initialImageUrl ?? undefined, getAccessToken);
 
   const openPicker = () => inputRef.current?.click();
+  const openCamera = () => cameraInputRef.current?.click();
 
   const handleFile = async (file: File) => {
     const errorMessage = validateImage(file, maxSizeMb, accept);
@@ -102,6 +106,20 @@ const ImageUpload: React.FC<Props> = ({
         }}
         disabled={disabled || uploading}
       />
+      <input
+        ref={cameraInputRef}
+        type="file"
+        accept={accept.join(",")}
+        capture="environment"
+        hidden
+        onChange={(e) => {
+          const file = e.target.files?.[0];
+          if (file) {
+            handleFile(file);
+          }
+        }}
+        disabled={disabled || uploading}
+      />
 
       <Stack spacing={2} alignItems="center">
         {!previewUrl ? (
@@ -109,9 +127,16 @@ const ImageUpload: React.FC<Props> = ({
             <Typography variant="body1" color="text.secondary">
               Upload image ({accept.join(", ")}, ≤ {maxSizeMb}MB)
             </Typography>
-            <Button variant="contained" onClick={openPicker} disabled={disabled || uploading}>
-              {uploading ? "Uploading…" : "Add image"}
-            </Button>
+            <Stack direction="row" spacing={1}>
+              <Button variant="contained" onClick={openPicker} disabled={disabled || uploading}>
+                {uploading ? "Uploading…" : "Add image"}
+              </Button>
+              {canUseCameraCapture && (
+                <Button variant="outlined" onClick={openCamera} disabled={disabled || uploading}>
+                  Take photo
+                </Button>
+              )}
+            </Stack>
           </>
         ) : (
           <>
@@ -125,6 +150,11 @@ const ImageUpload: React.FC<Props> = ({
               <Button variant="outlined" onClick={openPicker} disabled={disabled || uploading}>
                 Replace
               </Button>
+              {canUseCameraCapture && (
+                <Button variant="outlined" onClick={openCamera} disabled={disabled || uploading}>
+                  Take photo
+                </Button>
+              )}
               <Button color="error" variant="outlined" onClick={remove} disabled={disabled || uploading}>
                 Remove
               </Button>
