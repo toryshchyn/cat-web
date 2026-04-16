@@ -14,6 +14,8 @@ export type ItemFormValues = {
   container_id: number;
   /** Typed container label for resolving/creating a container when `container_id` is not set yet */
   container_input?: string;
+  /** Comma-separated tags typed by user (used for create-on-save flow). */
+  tags_input?: string;
   tags: number[];
   image_id?: number | null;
 }
@@ -97,8 +99,6 @@ const ItemForm: React.FC<Props> = ({
 
             <Grid size={{ xs: 12 }}>
               <TagAutocomplete
-                name="tags"
-                control={control}
                 disabled={isSubmitting}
               />
             </Grid>

@@ -5,6 +5,7 @@ import { ItemApiService, ItemRow } from "../services/item-api-service";
 import { ItemFormValues } from "../components/item-form/ItemForm";
 import { useItemFormBase } from "./useItemFormBase";
 import { resolveContainerIdForItem } from "../utils/resolve-container-for-item";
+import { resolveTagIdsForItem } from "../utils/resolve-tags-for-item";
 
 export function useEditItemForm() {
   const { itemId } = useParams<{ itemId: string }>();
@@ -25,6 +26,7 @@ export function useEditItemForm() {
           ...item,
           tags: item.tags ?? [],
           container_input: "",
+          tags_input: "",
         });
         setInitialImageUrl(item.imageUrl ?? null);
       })
@@ -37,17 +39,18 @@ export function useEditItemForm() {
     }
     try {
       const container_id = await resolveContainerIdForItem(data);
-      const { container_input: _ci, ...rest } = data;
+      const tags = await resolveTagIdsForItem(data);
+      const { container_input: _ci, tags_input: _ti, ...rest } = data;
       await ItemApiService.updateItem(Number(itemId), {
         ...rest,
         container_id,
-        tags: data.tags ?? [],
+        tags,
       });
       toast.success("Item updated successfully");
       if (closeAfter) {
         navigate("/dashboard");
       } else {
-        form.reset({ ...data, container_id, container_input: "" });
+        form.reset({ ...data, container_id, container_input: "", tags_input: "" });
       }
     } catch {
       toast.error("Failed to update item");

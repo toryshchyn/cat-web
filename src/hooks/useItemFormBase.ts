@@ -8,6 +8,7 @@ export function useItemFormBase(defaultValues?: Partial<ItemFormValues>) {
       description: null,
       container_id: 0,
       container_input: "",
+      tags_input: "",
       tags: [],
       image_id: null,
       ...defaultValues,

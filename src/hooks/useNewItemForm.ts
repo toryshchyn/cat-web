@@ -4,6 +4,7 @@ import { ItemApiService } from "../services/item-api-service";
 import { useItemFormBase } from "./useItemFormBase";
 import { ItemFormValues } from "../components/item-form/ItemForm";
 import { resolveContainerIdForItem } from "../utils/resolve-container-for-item";
+import { resolveTagIdsForItem } from "../utils/resolve-tags-for-item";
 
 type Defaults = {
   tagId?: number;
@@ -20,11 +21,12 @@ export function useNewItemForm(defaults: Defaults = {}) {
   const saveItem = async (data: ItemFormValues, closeAfter: boolean) => {
     try {
       const container_id = await resolveContainerIdForItem(data);
-      const { container_input: _ci, ...rest } = data;
+      const tags = await resolveTagIdsForItem(data);
+      const { container_input: _ci, tags_input: _ti, ...rest } = data;
       await ItemApiService.createItem({
         ...rest,
         container_id,
-        tags: data.tags ?? [],
+        tags,
       });
       toast.success("Item created successfully");
       if (closeAfter) {
@@ -36,6 +38,7 @@ export function useNewItemForm(defaults: Defaults = {}) {
           container_id: defaults.containerId ?? container_id,
           container_input: "",
           tags: defaults.tagId ? [defaults.tagId] : [],
+          tags_input: "",
           image_id: null,
         });
       }
