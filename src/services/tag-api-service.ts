@@ -43,4 +43,16 @@ export class TagApiService extends ApiService {
   static async getTagsWithCounts() {
     return super.request<TagWithCount[]>("/api/tags-with-counts");
   }
+
+  static async updateTag(id: number, body: { name: string }) {
+    return super.request<TagRow>(`/api/tag/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+  }
+
+  static async deleteTag(id: number) {
+    return super.requestVoid(`/api/tag/${id}`, { method: "DELETE" });
+  }
 }

@@ -3,7 +3,7 @@ import { Autocomplete, Box, CircularProgress, TextField, Typography } from '@mui
 import ViewToggle from "../components/dashboard/ViewToggle";
 import TagList from "../components/dashboard/TagList";
 import TagCloud from "../components/dashboard/TagCloud";
-import { useNavigate } from "react-router-dom";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { useTagsWithCounts } from "../hooks/useTagsWithCounts";
 import { ContainerApiService, ContainerWithCount } from "../services/container-api-service";
 import { ItemApiService, ItemRow } from "../services/item-api-service";
@@ -158,7 +158,14 @@ const Dashboard: React.FC = () => {
                 )}
 
                 <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 2, mb: 0.5 }}>
-                    <Typography variant="h6">Tags</Typography>
+                    <Typography
+                        variant="h6"
+                        component={RouterLink}
+                        to="/tags"
+                        sx={{ textDecoration: "none", color: "inherit", "&:hover": { textDecoration: "underline" } }}
+                    >
+                        Tags
+                    </Typography>
                     <ViewToggle mode={tagViewMode} onChange={setTagViewMode} />
                 </Box>
 
@@ -185,7 +192,14 @@ const Dashboard: React.FC = () => {
                 </Box>
 
                 <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 2, mt: 3, mb: 0.5 }}>
-                    <Typography variant="h6">Containers</Typography>
+                    <Typography
+                        variant="h6"
+                        component={RouterLink}
+                        to="/containers"
+                        sx={{ textDecoration: "none", color: "inherit", "&:hover": { textDecoration: "underline" } }}
+                    >
+                        Containers
+                    </Typography>
                     <ViewToggle mode={containerViewMode} onChange={setContainerViewMode} />
                 </Box>
 

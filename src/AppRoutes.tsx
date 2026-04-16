@@ -8,6 +8,8 @@ import NewItemPage from './pages/NewItemPage';
 import TagPage from './pages/TagPage';
 import ContainerPage from './pages/ContainerPage';
 import ItemDetailsPage from './pages/ItemDetailsPage';
+import TagsPage from './pages/TagsPage';
+import ContainersPage from './pages/ContainersPage';
 
 const AppRoutes = () => (
   <Router>
@@ -19,8 +21,10 @@ const AppRoutes = () => (
         <Route path="/new-item" element={<AuthGuard component={<NewItemPage />} />} />
         <Route path="/edit-item/:itemId" element={<AuthGuard component={<EditItemPage />} />} />
         <Route path="/tag/:tagId" element={<AuthGuard component={<TagPage />} />} />
+        <Route path="/tags" element={<AuthGuard component={<TagsPage />} />} />
         <Route path="/item/:id" element={<AuthGuard component={<ItemDetailsPage />} />} />
         <Route path="/container/:containerId" element={<AuthGuard component={<ContainerPage />} />} />
+        <Route path="/containers" element={<AuthGuard component={<ContainersPage />} />} />
       </Route>
     </Routes>
   </Router>

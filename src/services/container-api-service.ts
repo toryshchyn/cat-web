@@ -59,4 +59,16 @@ export class ContainerApiService extends ApiService {
       all.find((c) => c.name.toLowerCase() === name.toLowerCase()) ?? null
     );
   }
+
+  static async updateContainer(id: number, body: CreateContainerRequest) {
+    return super.request<ContainerRow>(`/api/container/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+  }
+
+  static async deleteContainer(id: number) {
+    return super.requestVoid(`/api/container/${id}`, { method: "DELETE" });
+  }
 }

@@ -7,6 +7,8 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import ApiIcon from '@mui/icons-material/Api';
 import AddIcon from '@mui/icons-material/Add';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import SellIcon from '@mui/icons-material/Sell';
+import CategoryIcon from '@mui/icons-material/Category';
 import { Outlet, Link } from 'react-router-dom';
 import { useAuth0 } from '@auth0/auth0-react';
 
@@ -129,6 +131,26 @@ const MasterLayout: React.FC = () => {
                                         <ApiIcon />
                                     </ListItemIcon>
                                     <ListItemText primary="API tests" />
+                                </ListItemButton>
+                            </Link>
+                        </ListItem>
+                        <ListItem>
+                            <Link to="/tags" style={{ textDecoration: 'none', color: 'inherit', display: 'block', width: '100%' }}>
+                                <ListItemButton>
+                                    <ListItemIcon>
+                                        <SellIcon />
+                                    </ListItemIcon>
+                                    <ListItemText primary="Tags" />
+                                </ListItemButton>
+                            </Link>
+                        </ListItem>
+                        <ListItem>
+                            <Link to="/containers" style={{ textDecoration: 'none', color: 'inherit', display: 'block', width: '100%' }}>
+                                <ListItemButton>
+                                    <ListItemIcon>
+                                        <CategoryIcon />
+                                    </ListItemIcon>
+                                    <ListItemText primary="Containers" />
                                 </ListItemButton>
                             </Link>
                         </ListItem>
