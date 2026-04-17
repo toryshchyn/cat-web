@@ -11,7 +11,8 @@ const NewItemPage: React.FC = () => {
   const {
     form,
     loading,
-    saveItem
+    saveItem,
+    autocompleteRefreshKey,
   } = useNewItemForm({
     tagId: state?.tagId,
     containerId: state?.containerId,
@@ -28,6 +29,7 @@ const NewItemPage: React.FC = () => {
         loading={loading}
         onSubmit={saveItem}
         mode="new"
+        autocompleteRefreshKey={autocompleteRefreshKey}
       />
     </Box>
   );

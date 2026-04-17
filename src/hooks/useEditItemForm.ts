@@ -38,8 +38,10 @@ export function useEditItemForm() {
       return;
     }
     try {
-      const container_id = await resolveContainerIdForItem(data);
-      const tags = await resolveTagIdsForItem(data);
+      const containerResult = await resolveContainerIdForItem(data);
+      const tagResult = await resolveTagIdsForItem(data);
+      const container_id = containerResult.containerId;
+      const tags = tagResult.tagIds;
       const { container_input: _ci, tags_input: _ti, ...rest } = data;
       await ItemApiService.updateItem(Number(itemId), {
         ...rest,

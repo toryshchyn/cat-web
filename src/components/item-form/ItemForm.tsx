@@ -27,6 +27,7 @@ type Props = {
   initialImageId?: number | null;
   initialImageUrl?: string | null;
   mode: "new" | "edit";
+  autocompleteRefreshKey?: number;
 };
 
 const ItemForm: React.FC<Props> = ({
@@ -34,6 +35,7 @@ const ItemForm: React.FC<Props> = ({
   onSubmit,
   mode,
   initialImageUrl,
+  autocompleteRefreshKey = 0,
 }) => {
   const {
     control,
@@ -67,6 +69,7 @@ const ItemForm: React.FC<Props> = ({
 
             <Grid size={{ xs: 12, sm: 6 }}>
               <ContainerAutocomplete
+                key={`container-autocomplete-${autocompleteRefreshKey}`}
                 name="container_id"
                 control={control}
                 disabled={isSubmitting}
@@ -99,6 +102,7 @@ const ItemForm: React.FC<Props> = ({
 
             <Grid size={{ xs: 12 }}>
               <TagAutocomplete
+                key={`tag-autocomplete-${autocompleteRefreshKey}`}
                 disabled={isSubmitting}
               />
             </Grid>

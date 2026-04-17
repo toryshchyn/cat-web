@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import { toast } from "react-toastify";
 import { ItemApiService } from "../services/item-api-service";
 import { useItemFormBase } from "./useItemFormBase";
@@ -13,6 +14,7 @@ type Defaults = {
 
 export function useNewItemForm(defaults: Defaults = {}) {
   const navigate = useNavigate();
+  const [autocompleteRefreshKey, setAutocompleteRefreshKey] = useState(0);
   const form = useItemFormBase({
     tags: defaults.tagId ? [defaults.tagId] : [],
     container_id: defaults.containerId ?? 0,
@@ -20,8 +22,10 @@ export function useNewItemForm(defaults: Defaults = {}) {
 
   const saveItem = async (data: ItemFormValues, closeAfter: boolean) => {
     try {
-      const container_id = await resolveContainerIdForItem(data);
-      const tags = await resolveTagIdsForItem(data);
+      const containerResult = await resolveContainerIdForItem(data);
+      const tagResult = await resolveTagIdsForItem(data);
+      const container_id = containerResult.containerId;
+      const tags = tagResult.tagIds;
       const { container_input: _ci, tags_input: _ti, ...rest } = data;
       await ItemApiService.createItem({
         ...rest,
@@ -32,6 +36,9 @@ export function useNewItemForm(defaults: Defaults = {}) {
       if (closeAfter) {
         navigate("/dashboard");
       } else {
+        if (containerResult.created || tagResult.createdCount > 0) {
+          setAutocompleteRefreshKey((prev) => prev + 1);
+        }
         form.reset({
           name: "",
           description: null,
@@ -47,5 +54,5 @@ export function useNewItemForm(defaults: Defaults = {}) {
     }
   };
 
-  return { form, loading: false, saveItem };
+  return { form, loading: false, saveItem, autocompleteRefreshKey };
 }

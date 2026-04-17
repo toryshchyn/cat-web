@@ -5,6 +5,11 @@ type TagFieldShape = {
   tags_input?: string;
 };
 
+export type ResolveTagsResult = {
+  tagIds: number[];
+  createdCount: number;
+};
+
 function parseTagNames(csv: string): string[] {
   const seen = new Set<string>();
   const result: string[] = [];
@@ -23,19 +28,22 @@ function parseTagNames(csv: string): string[] {
   return result;
 }
 
-export async function resolveTagIdsForItem(data: TagFieldShape): Promise<number[]> {
+export async function resolveTagIdsForItem(
+  data: TagFieldShape
+): Promise<ResolveTagsResult> {
   const csv = (data.tags_input ?? "").trim();
   if (!csv) {
-    return data.tags ?? [];
+    return { tagIds: data.tags ?? [], createdCount: 0 };
   }
 
   const names = parseTagNames(csv);
   if (!names.length) {
-    return [];
+    return { tagIds: [], createdCount: 0 };
   }
 
   let all = await TagApiService.getTags();
   const ids: number[] = [];
+  let createdCount = 0;
 
   for (const name of names) {
     const existing = all.find((t) => t.name.toLowerCase() === name.toLowerCase());
@@ -47,9 +55,10 @@ export async function resolveTagIdsForItem(data: TagFieldShape): Promise<number[
     if (!created) {
       throw new Error(`Failed to create tag: ${name}`);
     }
+    createdCount += 1;
     ids.push(created.id);
     all = [created, ...all];
   }
 
-  return ids;
+  return { tagIds: ids, createdCount };
 }
