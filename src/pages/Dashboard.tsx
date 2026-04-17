@@ -9,6 +9,8 @@ import { ContainerApiService, ContainerWithCount } from "../services/container-a
 import { ItemApiService, ItemRow } from "../services/item-api-service";
 import ItemGrid from "../components/shared/ItemGrid";
 
+const SEARCH_DEBOUNCE_MS = 500;
+
 const Dashboard: React.FC = () => {
     const [tagViewMode, setTagViewMode] = useState<"cloud" | "list">("cloud");
     const [containerViewMode, setContainerViewMode] = useState<"cloud" | "list">("cloud");
@@ -23,6 +25,21 @@ const Dashboard: React.FC = () => {
     const navigate = useNavigate();
     const { tags, loading: tagsLoading, error: tagsError } = useTagsWithCounts();
     const normalizedQuery = useMemo(() => searchQuery.trim(), [searchQuery]);
+    const [debouncedQuery, setDebouncedQuery] = useState("");
+
+    useEffect(() => {
+        if (!normalizedQuery || normalizedQuery.length < 2) {
+            setDebouncedQuery("");
+            return;
+        }
+        const id = window.setTimeout(() => {
+            setDebouncedQuery(normalizedQuery);
+        }, SEARCH_DEBOUNCE_MS);
+        return () => window.clearTimeout(id);
+    }, [normalizedQuery]);
+
+    const searchDebouncing =
+        normalizedQuery.length >= 2 && normalizedQuery !== debouncedQuery;
 
     useEffect(() => {
         const controller = new AbortController();
@@ -52,7 +69,7 @@ const Dashboard: React.FC = () => {
     }, []);
 
     useEffect(() => {
-        if (!normalizedQuery || normalizedQuery.length < 2) {
+        if (!debouncedQuery || debouncedQuery.length < 2) {
             setSearchResults([]);
             setSearchError(null);
             setSearchLoading(false);
@@ -66,7 +83,8 @@ const Dashboard: React.FC = () => {
             try {
                 setSearchLoading(true);
                 setSearchError(null);
-                const data = await ItemApiService.searchItemsByName(normalizedQuery);
+                const data = await ItemApiService.searchItemsByText(debouncedQuery);
+
                 if (!signal.aborted) {
                     const withContainerName = data.map((item) => ({
                         ...item,
@@ -90,10 +108,10 @@ const Dashboard: React.FC = () => {
 
         fetchMatches();
         return () => controller.abort();
-    }, [normalizedQuery, containers]);
+    }, [debouncedQuery, containers]);
 
     useEffect(() => {
-        if (!normalizedQuery || normalizedQuery.length < 2) {
+        if (!debouncedQuery || debouncedQuery.length < 2) {
             setItemNameSuggestions([]);
             return;
         }
@@ -103,9 +121,13 @@ const Dashboard: React.FC = () => {
 
         const fetchSuggestions = async () => {
             try {
-                const data = await ItemApiService.getItemNameSuggestions(normalizedQuery);
+                const data = await ItemApiService.getItemNameSuggestions(debouncedQuery);
                 if (!signal.aborted) {
-                    setItemNameSuggestions(data);
+                    const lowerQuery = debouncedQuery.toLowerCase();
+                    const tagMatches = tags
+                        .map((tag) => tag.name)
+                        .filter((name) => name.toLowerCase().includes(lowerQuery));
+                    setItemNameSuggestions(Array.from(new Set([...data, ...tagMatches])));
                 }
             } catch {
                 if (!signal.aborted) {
@@ -116,7 +138,7 @@ const Dashboard: React.FC = () => {
 
         fetchSuggestions();
         return () => controller.abort();
-    }, [normalizedQuery]);
+    }, [debouncedQuery, tags]);
 
     return (
         <Box sx={{ my: 4 }}>
@@ -129,8 +151,8 @@ const Dashboard: React.FC = () => {
                     renderInput={(params) => (
                         <TextField
                             {...params}
-                            label="Search item by name"
-                            placeholder="Type item name..."
+                            label="Search item by text"
+                            placeholder="Type name, description, or tag..."
                             size="small"
                             fullWidth
                         />
@@ -143,7 +165,7 @@ const Dashboard: React.FC = () => {
                         <Typography variant="h6" sx={{ mb: 0.75 }}>
                             Item matches
                         </Typography>
-                        {searchLoading ? (
+                        {searchDebouncing || searchLoading ? (
                             <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
                                 <CircularProgress />
                             </Box>

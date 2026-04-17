@@ -20,6 +20,7 @@ export type ItemRow = {
 };
 
 export type ItemResponse = Omit<ItemRow, "imageUrl">;
+export type ItemSearchRow = Omit<ItemRow, "imageUrl"> & { containerName?: string };
 
 export function mapItem(raw: ItemResponse): ItemRow {
   return {
@@ -56,6 +57,17 @@ export class ItemApiService extends ApiService {
   static async searchItemsByName(name: string): Promise<ItemRow[]> {
     const data = await super.request<ItemResponse[]>(
       `/api/items/search?name=${encodeURIComponent(name)}`
+    );
+    return data.map(mapItem);
+  }
+
+  static async searchItemsByText(q: string, containerId?: number): Promise<ItemRow[]> {
+    const params = new URLSearchParams({ q });
+    if (containerId !== undefined) {
+      params.set("container_id", String(containerId));
+    }
+    const data = await super.request<ItemSearchRow[]>(
+      `/api/items/search-text?${params.toString()}`
     );
     return data.map(mapItem);
   }
